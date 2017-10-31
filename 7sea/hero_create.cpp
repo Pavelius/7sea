@@ -1,5 +1,7 @@
 #include "main.h"
 
+static const char* text_points[] = {"очков", "очко", "очка", "очка", "очка", "очков"};
+
 static char* add(char* p, char* result, const char* title, const char* name, int value)
 {
 	if(!value)
@@ -77,7 +79,7 @@ void hero::choosetraits(bool interactive)
 		auto id = (trait_s)logs::input(interactive, true, "Выберите особенность, в которых вы сильны (осталось [%1i])", count--);
 		traits[id]++;
 	}
-	experience = 100 - 8 * (5 + count);
+	experience = 100 - 8 * (5 + 2);
 }
 
 void hero::chooseadvantage(bool interactive)
@@ -125,6 +127,27 @@ void hero::chooseadvantage(bool interactive)
 		{
 			advantages[Noble] = 1;
 			experience -= cost;
+		}
+	}
+	if(true)
+	{
+		print_hero(this);
+		for(auto i = (advantage_s)FirstAdvantage; i <= LastAdvantage; i = (advantage_s)(i+1))
+		{
+			if(i == Noble)
+				continue;
+			if(get(i))
+				continue;
+			auto cost = getcost(i);
+			if(!cost || cost>experience)
+				continue;
+			logs::add(i, "%1 (стоит [%2i] %3).", getstr(i), cost, maptbl(text_points, cost));
+		}
+		if(logs::getcount())
+		{
+			auto result = (advantage_s)logs::input(interactive, true, "Выбирайте [одно] преемущество из списка ниже");
+			advantages[result]++;
+			experience -= getcost(result);
 		}
 	}
 }

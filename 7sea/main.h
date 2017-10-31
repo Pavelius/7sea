@@ -9,7 +9,7 @@
 	"Invalid count of " #name " elements")
 #define getstr_enum(ename) template<> const char* getstr<ename##_s>(ename##_s value) { return ename##_data[value].name[1]; }
 #define getinf_enum(ename) template<> const char* getinfo<ename##_s>(ename##_s value) { return ename##_data[value].text; }
-#define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0]))))])
+#define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0])-1)))])
 
 enum trait_s : unsigned char {
 	Brawn, Finesse, Resolve, Wits, Panache,
@@ -23,11 +23,11 @@ enum skill_s : unsigned char {
 };
 enum advantage_s : unsigned char {
 	AbleDrinker, Academy, Appearance, CastilliansEducation,
-	Citation, Connections, CombatReflexes, Commissions,
-	DangerousBeauty, DracheneisenNoble, Faith, FoulWeatherJack,
-	IndomitableWill, Inheritance, KeenSences,
-	Large, LeftHanded, LegendaryFiness, Linguist,
-	MembershipTradeGuild, Noble, Ordained, Patron, Scoundrel, Servants, Small,
+	Citation, CombatReflexes, Commissions,
+	DangerousBeauty, DracheneisenNoble, FoulWeatherJack,
+	IndomitableWill, KeenSences,
+	Large, Linguist,
+	Noble, Ordained, Scoundrel, Small,
 	Toughness, University,
 	FirstAdvantage = AbleDrinker, LastAdvantage = University,
 };
