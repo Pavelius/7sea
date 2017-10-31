@@ -153,13 +153,17 @@
     <ClCompile Include="knack.cpp" />
     <ClCompile Include="logs.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="nation.cpp" />
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="print.cpp" />
+    <ClCompile Include="skill.cpp" />
+    <ClCompile Include="sorcery.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="stringcreator.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="surface_serial.cpp" />
+    <ClCompile Include="swordsman.cpp" />
     <ClCompile Include="trait.cpp" />
     <ClCompile Include="win_draw.cpp" />
     <ClCompile Include="win_io_file.cpp" />

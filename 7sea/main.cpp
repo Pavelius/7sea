@@ -5,9 +5,7 @@ int	main(int argc, char *argv[])
 	auto hero_size = sizeof(hero);
 	logs::open("7 sea");
 	hero player;
-	player.clear();
-	player.choosetraits(true);
-	player.chooseadvantage(true);
+	player.create(true);
 	return 0;
 }
 

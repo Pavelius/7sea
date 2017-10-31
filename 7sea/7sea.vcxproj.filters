@@ -144,6 +144,18 @@
     <ClCompile Include="advantage.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="nation.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="sorcery.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="swordsman.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="skill.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Библиотека">

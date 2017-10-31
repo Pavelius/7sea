@@ -8,6 +8,7 @@
 #define assert_enum(name, last) static_assert(sizeof(name##_data) / sizeof(name##_data[0]) == last + 1,\
 	"Invalid count of " #name " elements")
 #define getstr_enum(ename) template<> const char* getstr<ename##_s>(ename##_s value) { return ename##_data[value].name[1]; }
+#define getinf_enum(ename) template<> const char* getinfo<ename##_s>(ename##_s value) { return ename##_data[value].text; }
 #define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0]))))])
 
 enum trait_s : unsigned char {
@@ -18,6 +19,7 @@ enum skill_s : unsigned char {
 	Artist, Courtier, Criminal, Doctor, Hunter, Merchant, Performer, Sailor, Scholar, Servant, Spy, Streetwise,
 	Archer, Athlete, Buckler, Commander, Crossbow, DirtyFighting, Fencing,
 	Firearms, HeavyWeapon, Knife, PanzerhandSkill, Polearm, Pugilism, Rider, Wrestling,
+	FirstSkill = Artist, LastSkill = Wrestling,
 };
 enum advantage_s : unsigned char {
 	AbleDrinker, Academy, Appearance, CastilliansEducation,
@@ -115,6 +117,7 @@ enum background_s : unsigned char {
 	FirstBackground = Amnesia, LastBackground = Vow,
 };
 enum sorcery_s : unsigned char {
+	NoSorcery,
 	Glamour, Porte, Pyeryem, Laerdom, Sorte,
 	FirstSorcery = Glamour, LastSorcery = Sorte,
 };
@@ -155,8 +158,9 @@ enum gender_s : unsigned char {
 	Male, Female,
 };
 enum swordsman_s : unsigned char {
-	Aldana, Donowan, Eisenfaust, Valroux, Leegstra, Ambrogia,
-	FirstSwordsmansSchool = Aldana, LastSwordsmansSchool = Ambrogia,
+	NoSwordsman,
+	Aldana, Ambrogia, Donowan, Eisenfaust, Leegstra, Valroux,
+	FirstSwordsmansSchool = Aldana, LastSwordsmansSchool = Valroux,
 };
 enum family_s : unsigned char {
 	NoFamily,
@@ -174,21 +178,30 @@ struct hero
 	gender_s			gender;
 	short				experience;
 	operator bool() const { return traits[0]!=0; }
-	void				chooseadvantage(bool interactive);
-	void				choosetraits(bool interactive);
+	void				create(bool interactive);
 	void				clear();
 	const char*			getname() const { return "Óëüðèê"; }
 	int					get(advantage_s id) const { return advantages[id]; }
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
-	int					getcost(advantage_s id, int level) const;
+	int					getcost(advantage_s id) const;
+	sorcery_s			getsorcery() const;
+	swordsman_s			getswordsman() const;
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
 private:
 	char				swordsman, sorcery;
 	char				advantages[LastAdvantage + 1];
+	char				skills[LastSkill + 1];
 	char				traits[LastTrait + 1];
 	char				knacks[LastSorte + 1];
+	//
+	void				applynation();
+	void				chooseadvantage(bool interactive);
+	void				choosenation(bool interactive);
+	void				chooseskills(bool interactive);
+	void				choosetraits(bool interactive);
 };
 extern adat<hero, 64>	heroes;
 extern hero*			players[6];
+template<class T> const char* getinfo(T e);
