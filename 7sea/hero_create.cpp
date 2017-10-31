@@ -1,11 +1,5 @@
 #include "main.h"
 
-struct genanswer
-{
-	int				cost;
-	const char*		text;
-};
-
 static char* add(char* p, char* result, const char* title, const char* name, int value)
 {
 	if(!value)
@@ -44,14 +38,15 @@ static char* add_knacks(char* result, hero* player, const char* end)
 	return p;
 }
 
-static void add_hero(char* result, hero* player)
+static void add_hero(char* result, hero* player, bool show_experience = true)
 {
 	auto p = add_traits(result, player, "\n");
 	p = add_knacks(result, player, "\n");
-}
-
-static void chooseanswer(hero* player)
-{
+	if(show_experience)
+	{
+		if(player->experience)
+			szprint(p, "У вас осталось [%1i] очков.", player->experience);
+	}
 }
 
 static void print_hero(hero* player)
@@ -77,4 +72,14 @@ void hero::choosetraits(bool interactive)
 		auto id = (trait_s)logs::input(interactive, true, "Выберите особенности, которые вам присущи (осталось [%1i])", count--);
 		traits[id]++;
 	}
+}
+
+void hero::chooseadvantage(bool interactive)
+{
+	print_hero(this);
+	logs::add("Ваши родители владели волшебством?");
+	logs::add(0, "Нет.");
+	logs::add(1, "Да. Один из них был волшебником. Это стоит [20] очков.");
+	logs::add(2, "Оба моих родителя были волшебниками. Это стоит [40] очков.");
+	auto id = logs::input();
 }

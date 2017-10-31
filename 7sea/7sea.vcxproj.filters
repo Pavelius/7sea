@@ -141,6 +141,9 @@
     <ClCompile Include="hero.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="advantage.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Библиотека">

@@ -19,6 +19,16 @@ enum skill_s : unsigned char {
 	Archer, Athlete, Buckler, Commander, Crossbow, DirtyFighting, Fencing,
 	Firearms, HeavyWeapon, Knife, PanzerhandSkill, Polearm, Pugilism, Rider, Wrestling,
 };
+enum advantage_s : unsigned char {
+	AbleDrinker, Academy, Appearance, CastilliansEducation,
+	Citation, Connections, CombatReflexes, Commissions,
+	DangerousBeauty, DracheneisenNoble, Faith, FoulWeatherJack,
+	IndomitableWill, Inheritance, KeenSences,
+	Large, LeftHanded, LegendaryFiness, Linguist,
+	MembershipTradeGuild, Noble, Ordained, Patron, Scoundrel, Servants, Small,
+	Toughness, University,
+	FirstAdvantage = AbleDrinker, LastAdvantage = University,
+};
 enum knack_s : unsigned char {
 	Composer, Drawing, Musician, Sculpting, Singing, Writing,
 	Dancing, Etiquette, Fashion, Oratory,
@@ -162,13 +172,21 @@ struct hero
 	nation_s			nation;
 	family_s			family;
 	gender_s			gender;
+	short				experience;
 	operator bool() const { return traits[0]!=0; }
+	void				chooseadvantage(bool interactive);
 	void				choosetraits(bool interactive);
 	void				clear();
 	const char*			getname() const { return "Óëüðèê"; }
+	int					get(advantage_s id) const { return advantages[id]; }
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
+	int					getcost(advantage_s id, int level) const;
+	bool				issorcery() const { return sorcery != 0; }
+	bool				isswordsman() const { return swordsman != 0; }
 private:
+	char				swordsman, sorcery;
+	char				advantages[LastAdvantage + 1];
 	char				traits[LastTrait + 1];
 	char				knacks[LastSorte + 1];
 };

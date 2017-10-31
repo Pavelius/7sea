@@ -7,6 +7,7 @@ int	main(int argc, char *argv[])
 	hero player;
 	player.clear();
 	player.choosetraits(true);
+	player.chooseadvantage(true);
 	return 0;
 }
 
