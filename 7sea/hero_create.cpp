@@ -1,5 +1,11 @@
 #include "main.h"
 
+struct genanswer
+{
+	int				cost;
+	const char*		text;
+};
+
 static char* add(char* p, char* result, const char* title, const char* name, int value)
 {
 	if(!value)
@@ -42,6 +48,10 @@ static void add_hero(char* result, hero* player)
 {
 	auto p = add_traits(result, player, "\n");
 	p = add_knacks(result, player, "\n");
+}
+
+static void chooseanswer(hero* player)
+{
 }
 
 static void print_hero(hero* player)
