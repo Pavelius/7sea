@@ -2,6 +2,7 @@
 
 int	main(int argc, char *argv[])
 {
+	auto hero_size = sizeof(hero);
 	logs::open("7 sea");
 	return 0;
 }

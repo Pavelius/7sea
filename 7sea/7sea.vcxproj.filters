@@ -129,6 +129,9 @@
     <ClCompile Include="print.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="knack.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Библиотека">

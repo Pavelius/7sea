@@ -147,6 +147,7 @@
     <ClCompile Include="draw_text.cpp" />
     <ClCompile Include="draw_textf.cpp" />
     <ClCompile Include="io.cpp" />
+    <ClCompile Include="knack.cpp" />
     <ClCompile Include="logs.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pma.cpp" />

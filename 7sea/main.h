@@ -10,235 +10,165 @@
 #define getstr_enum(ename) template<> const char* getstr<ename##_s>(ename##_s value) { return ename##_data[value].name[1]; }
 #define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0]))))])
 
-enum class_s : unsigned char {
-	Cleric, Fighter, Mage, Theif,
-	FirstClass = Cleric, LastClass = Theif,
+enum trait_s : unsigned char {
+	Brawn, Finesse, Resolve, Wits, Panache,
+	FirstTrait = Brawn, LastTrait = Panache,
 };
-enum race_s : unsigned char {
-	NoRace,
-	Dwarf, Elf, Halfling, Human,
-	Animal, Beastman, Construct, FantasticCreature,
-	GiantHumanoid, Ooze, SummonedCreature,
-	Undead, Vermin
+enum skill_s : unsigned char {
+	Artist, Courtier, Criminal, Doctor, Hunter, Merchant, Performer, Sailor, Scholar, Servant, Spy, Streetwise,
+	Archer, Athlete, Buckler, Commander, Crossbow, DirtyFighting, Fencing,
+	Firearms, HeavyWeapon, Knife, PanzerhandSkill, Polearm, Pugilism, Rider, Wrestling,
 };
-enum ability_s : unsigned char {
-	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma
+enum knack_s : unsigned char {
+	Composer, Drawing, Musician, Sculpting, Singing, Writing,
+	Dancing, Etiquette, Fashion, Oratory,
+	Gambling, Quack, Shadowing, Stealth,
+	Diagnosis, FirstAid,
+	Fishing, Skinning, Survival, Tracking, TrailSigns, Traps,
+	Blacksmith, Butcher, Cooking, Fletcher, Furrier, Glassblower, Innkeeper, Jeweler, Potter,
+	Acting,
+	Balance, Climbing, Knotwork, Rigging,
+	History, Mathematics, Philosophy, Research,
+	MenitalTask, Unobrusive,
+	Socializing, StreetNavigation,
+	AttackBow,
+	Footwork, Sprinting, Throwing,
+	ParryBuckler,
+	Strategy, Tactics,
+	AttackCrossbow,
+	AttackDirtyFighting,
+	AttackFencing, ParryFencing,
+	AttackFirearms,
+	AttackHeavyWeapon, ParryHeavyWeapon,
+	AttackKnife, ParryKnife,
+	AttackPanzerhand, ParryPanzerhand,
+	AttackPolearm, ParryPolearm,
+	AttackPugilism, Jab,
+	Ride,
+	Grapple,
+	FirstKnack = Composer, LastKnack = Grapple,
+	// Advenced knacks
+	Diplomacy, Gaming, Gossip, LipReading, Mooch, Politics, Scheming, Sedution, Sincerity,
+	Ambush, Cheating, Lockpicking, Pickpocket, Prestidigitation, Scrounging,
+	Dentist, Examiner, Surgery, Veterinarian,
+	AnimalTraining,
+	Accounting, Appraising, Bartending, Haggling,
+	Circus, ColdRead, Disguise, Storytelling,
+	Cartography, Leaping, Navigation, Pilot, SeaLore, Swimming, Weather,
+	Astronomy, Law, NaturalPhilosophy, Occult, Theology,
+	DriveCarriage, Seneschal, Valet,
+	Bribery, Conceal, Cryptography, Forgery, HandSigns, Interrogation, Poison,
+	Shopping, UnderworldLore,
+	HorseArchery, Snapshot, TrickShooting,
+	BreakFall, LongDistanceRunning, Lifting, Rolling, Swinging, SideStep,
+	AttackBuckler,
+	Artillery, Gunnery, Incitation, Leadership, Logistic,
+	ReloadCrossbow,
+	AttackImprovisedWeapon, EyeGouge, Kick, ParryImprovisedWeapon, ThroatStrike, ThrowImprovisedWeapon,
+	ReloadFirearms,
+	ThrowKnife,
+	Uppercut,
+	SetDefence,
+	EarClap,
+	Mounting, TrickRiding,
+	BearHug, Break, Escape, HeadButt,
+	FirstAdvancedKnack = Diplomacy, LastAdvancedKnack = HeadButt,
+	// Swordsman's knacks
+	Beat, Bind, CorpseACorpse, Disarm, DoubleParry,
+	Feint, Lunge, PommelStrike, Riposte, Togging, FindWeakness,
+	FirstSwordsmansKnack = Beat, LastSwordsmansKnack = FindWeakness,
+	// Glamour knacks
+	GlamourGreenMan, GlamourHonoredHunter, GlamourJack, GlamourRobinGoodFellow, GlamourThomas,
+	FirstGlamour = GlamourGreenMan, LastGlamour = GlamourThomas,
+	// Laerdom knacks
+	LaerdomAnger, LaerdomCalm, LaerdomEmpathy, LaerdomFlesh, LaerdomFury,
+	LaerdomGateway, LaerdomGloom, LaerdomGreatness, LaerdomHarvest, LaerdomHatred,
+	LaerdomIntensity, LaerdomJourney, LaerdomMountain, LaerdomMystery, LaerdomOmen,
+	LaerdomPassion, LaerdomRuin, LaerdomSkill, LaerdomSolitude, LaerdomStrength,
+	LaerdomUnbound, LaerdomWarrior, LaerdomWealth, LaerdomWholeness,
+	FirstLaerdom = LaerdomAnger, LastLaerdom = LaerdomWholeness,
+	// Porte knacks
+	PorteAttunement, PorteBlooding, PorteBring, PortePocket, PorteWalk,
+	FirstPorte = PorteAttunement, LastPorte = PorteWalk,
+	// Pyeryem knacks
+	PyeryemSpeak, PyeryemMan, PyeryemCat, PyeryemGoshawk, PyeryemBear, PyeryemMouse,
+	PyeryemOtter, PyeryemOwl, PyeryemRabbit, PyeryemFox, PyeryemLeopard, PyeryemWolf,
+	FirstPyeryem = PyeryemSpeak, LastPyeryem = PyeryemWolf,
+	// Sorte knacks
+	SorteArcana, SorteCoins, SorteCups, SorteStaves, SorteSwords,
+	FirstSorte = SorteArcana, LastSorte = SorteSwords,
+	FirstSorceryKnack = FirstGlamour, LastSorceryKnack = LastSorte,
 };
-enum alignment_s : unsigned char {
-	Lawful, Neutral, Chaotic
+enum background_s : unsigned char {
+	Amnesia, Cursed, Debt, Defeated, Fear, Hunted, Hunting, LostLove, MistakenIdentify,
+	Nemesis, Obligation, Rivalry, Romance, TrueIdentify, Vendetta, Vow,
+	FirstBackground = Amnesia, LastBackground = Vow,
+};
+enum sorcery_s : unsigned char {
+	Glamour, Porte, Pyeryem, Laerdom, Sorte,
+	FirstSorcery = Glamour, LastSorcery = Sorte,
+};
+enum ship_s : unsigned char {
+	Sloop, Caravela, Frigata, Galeon, Linkor,
+	FirstShipType = Sloop, LastShipType = Linkor,
+};
+enum cargo_s : unsigned char {
+	Woods, Ore, Glass, Paper, Leather, Iron, Gold,
+	FirstMaterial = Woods, LastMaterial = Gold,
+};
+enum modification_s : unsigned char {
+	HiddenTowline, Oars, ProwRam, ReinforcedMasts,
+	ConcealedGunports, Overgunned, SilkSails, SturdyHull, WellTrainedCrew, WideRudder,
+	Decoration, ExtendedKeel, Lucky, SmugglingCompartments,
+	ExtraCargoSpace, ExtraCrewQuarters, GoodCaptain, NarrowHull,
+	BoardingParty, ExtraBoardingGuns, FriendlySpirit, SlightDraft, SwivelCannon,
+	FirstModifications = HiddenTowline, LastModifications = SwivelCannon,
+	FlimsyMasts, Old, Sluggish,
+	BrittleHull, LeakyHull, PoorlyTrainedCrew, SmallKeel, SmallRudder, TatteredSails, Undergunned,
+	FirstFlaws = FlimsyMasts, LastFlaws = Undergunned,
+};
+enum location_s : unsigned char {
+	CitySanFeodoro, CityFalconsPoint, CitySanAugustin, CityLaReinaDelMar, CitySanJuan,
+	CityLaBucca,
+	CitySanFelipe, CityRioja, CityAvila, CitySanEliseo, CityPuertoDeSur, CityLaPasiego, CityTarango,
+	CitySanCristobal, CitySanGustavo,
+	CityVaticin,
+	FirstCity = CitySanFeodoro, LastCity = CityVaticin,
+};
+enum nation_s : unsigned char {
+	Avalon, Castille, Eisen, Montaigne, Ussura, Vendel, Vodacce,
+	FirstNation = Avalon, LastNation = Vodacce,
+	Crescent, HightEisen, Teodoran, Thean,
+	FirstLanguage = Avalon, LastLanguage = Thean,
 };
 enum gender_s : unsigned char {
 	Male, Female,
 };
-enum save_s : unsigned char {
-	NoSave,
-	SavePetrification, SaveParalizis, SavePoison, SaveDeath,
-	SaveBlast, SaveBreath, SaveStaffWands, SaveSpells
+enum swordsman_s : unsigned char {
+	Aldana, Donowan, Eisenfaust, Valroux, Leegstra, Ambrogia,
+	FirstSwordsmansSchool = Aldana, LastSwordsmansSchool = Ambrogia,
 };
-enum skill_s : unsigned char {
-	Acrobatics, Alchemy, Alertness, Ambushing, AnimalHusbandry, AnimalTraining, Apostasy, ArcaneDabblin, Painting,
-	Bargaining, BattleMagic, BeastFriendship, Berserkergang, BlackLoreOfZahar, BlindFighting, Bribery,
-	Caving, CatBurglary, Climbing, CollegiateWizardry, CombatReflexes, CombatTrickery, Command, Contemplation, Contortionism,
-	Smithing,
-	Diplomacy, Disguise, DivineBlessing, DivineHealth, DungeonBashing, DwarvenBrewing,
-	Eavesdropping, Elementalism, Endurance, Engineering,
-	Familiar, FightingStyleDualWeapon, FightingStyleMissile, FightingStylePole, FightingStyleSigle, FightingStyleTwoHanded, FightingStyleWeaponAndShield,
-	Gambling, GoblinSlaying,
-	Healing,
-	IllusionResistance, Intimidation,
-	History, Mining, LandSurveying, LayingOnHands, Leadership, LipReading, Lockpicking, Loremastery,
-	MagicalMusic, Mapping, MartialTraining, MilitaryStrategy, Mimicry, Mountaineering, MysticAura,
-	Naturalism, Navigation,
-	PassingWithoutTrace, Dancing, PreciseShooting, Prestidigitation, Scribing, Prophecy,
-	QuietMagic,
-	Riding, RighteousTurning, Running,
-	Seafaring, Seduction, SensingEvil, SensingPower, Signaling, Skirmishing, Skulking, Sniping, Survival, Swashbuckling,
-	Theology, TrapFinding, Tracking, Transmogrification, Trapping,
-	WeaponFinesse, WeaponFocusBows, WeaponFocusSwords, WeaponFocusAxes,
-	FirstSkill = Acrobatics, LastSkill = WeaponFocusAxes,
+enum family_s : unsigned char {
+	NoFamily,
+	Gaegos, Ochoa, Ordunio, Sandoval, Soldano, Torres, Zepeda,
+	Asedo, Arsingierro, Avilla, Beharanno, Garsia, Grihalwa, Gusman, Lopez, Montoya, Nunyes, Ontiveros, Ramirez, Rioha, Rios, Rivera, Rodriges, Vaskes, Wellaskes, Yanches,
+	AvalonLock, AvalonHood, AvalonGreen, AvalonDoors, AvalonSmith,
+	MacAllister, MacDuff, MacBride, MacCordum, MacDonald, MacIchern, MacIntire, MacLaud,
+	OBannon, OTool,
+	AllaisDuCrieus, DuMontaigne, FlauberDuDore, RicheDuParroise, LevequeDAur,
 };
-enum language_s : unsigned char {
-	LanguageDwarvish, LanguageElvish, LanguageGiant, LanguageGoblin, LanguageHalfling, LanguageOrc,
-	LanguageAbysal, LanguageCelestial, LanguageDraconic, LanguageDeepSpeech,
-	FirstLanguage = LanguageDwarvish, LastLanguage = LanguageDeepSpeech
-};
-enum state_s : unsigned char {
-	StateBlessed, StateCharmed, StateLighted, StateProtectedFromEvil, StateShielded, StateSleeped,
-	FirstState = StateBlessed, LastState = StateSleeped,
-};
-enum building_s : unsigned char {
-	Barracs, Castle, Graveyard, Harbor, Laboratory,
-	Marketplace, Mill, Stable, Smithy, Tavern,
-	Temple,
-	FirstBuilding = Barracs, LastBuilding = Temple,
-};
-enum item_s : unsigned char {
-	NoItem,
-	// Items (weapon melee)
-	Club, Flail, Hammer, Mace,
-	Spear, Javelin, Staff,
-	Axe, Halberd,
-	Dagger, SwordGreat, SwordLong, SwordShort,
-	// Items (weapon ranged)
-	Crossbow, BowLong, BowShort, Dart, Sling,
-	Stone, Arrow, Bolt,
-	// Items (armor)
-	HideArmour, LeatherArmour, RingMail, ScaleMail, ChainMail, BandedMail, PlateMail,
-	Shield, Helmet, Bracers,
-	// Items (other)
-	Ration, Apple,
-	Coin,
-	FirstItem = Club, LastItem = Coin,
-};
-enum wear_s : unsigned char {
-	// Body locations
-	MeleeWeapon, SecondanaryWeapon, RangedWeapon,
-	Head, Neck, Torso, Amunitions, RightFinger, LeftFinger, Elbows, Legs,
-	FirstWear = MeleeWeapon, LastWear = Legs
-};
-enum size_s : unsigned char {
-	SizeTiny, SizeSmall, SizeMedium, SizeLarge, SizeHuge
-};
-enum range_s : unsigned char {
-	RangeSelf, RangeTouch, Range10, Range30, Range60, Range120, Range150, Range240
-};
-enum duration_s : unsigned char {
-	TimeInstantaneous, TimeConcentration, TimeSpecial,
-	Time2Turns, Time3Turns, Time4d4Turns, Time6p1Turns, Time2d6Turns,
-	Time6Turns,
-};
-enum spell_s : unsigned char {
-	SpellCharmPerson, SpellDetectMagic, SpellFloatingDisc, SpellHoldPortal, SpellLight,
-	SpellMagicMissile, SpellMagicMouth, SpellProtectionFromEvil, SpellReadLanguages, SpellShield,
-	SpellSleep, SpellVentriloquism,
-	SpellContinualLight,
-	FirstSpell = SpellCharmPerson, LastSpell = SpellContinualLight,
-};
-enum monster_s : unsigned char {
-	Ork, Zombie,
-	FirstMonster = Ork, LastMonster = Zombie,
-};
-enum cost_s : unsigned {
-	CP = 1, SP = 10, GP = 100,
-};
-enum encounter_type_s {
-	Dungeon, DungeonLair, Wilderness, WildernessLair
-};
-enum landscape_s {
-	Plains, Mountains, Hills, Forest,
-	Desert, Jungle, Swamp,
-	Coast, OpenSea,
-};
-struct item
+struct hero
 {
-	item_s				type;
-	item() : type(NoItem) {}
-	item(item_s type) : type(type) {}
-	operator bool() const { return type != NoItem; }
-	//
-	int					getarmor() const;
-	const dice&			getdamage(bool two_handed) const;
-	const char*			getname() const;
-	bool				islight() const;
-	bool				istwohanded() const;
-};
-struct damageinfo
-{
-	int					difficult;
-	dice				damage;
-	item*				weapon;
-};
-struct monster_i
-{
-	const char*			name[3];
-	race_s				race;
+	nation_s			nation;
+	family_s			family;
 	gender_s			gender;
-	class_s				type;
-	alignment_s			alignment;
-	char				level;
-	int					experience;
-	char				ac;
-	unsigned char		ability[6];
-	dice				encounters[4];
-};
-struct creature
-{
-	race_s				race;
-	gender_s			gender;
-	class_s				type;
-	alignment_s			alignment;
-	unsigned char		level;
-	monster_i*			monster;
-	//
-	void				add(skill_s id, int value) { proficiency[id] += value; }
-	bool				attack(creature* enemy, bool interactive, int bonus = 0, bool flat_footed = false, wear_s weapon = MeleeWeapon);
-	void				chooseability();
-	void				chooseclass(bool interactive);
-	void				chooseequipment(bool interactive);
-	void				choosegender(bool interactive);
-	void				chooseskills(bool interactive, const char* skill_name, skill_s* source, unsigned maximum, int count = 1);
-	void				clear();
-	void				create(bool interactive, bool add_party);
-	void				create(monster_s type);
-	void				damage(int value, bool interactive);
-	int					get(ability_s id) const { return ability[id]; }
-	int					get(skill_s id) const { return proficiency[id]; }
-	const char*			getA() const { return (gender==Female) ? "à" : ""; }
-	int					getarmor(bool flatfooted = false) const;
-	bool				getattack(damageinfo& result, wear_s slot) const;
-	int					getbonus(ability_s id) const;
-	class_s				getclass() const { return type; }
-	int					getdifficult(skill_s value) const;
-	int					gethp() const;
-	int					getinitiative() const;
-	const char*			getname() const;
-	int					getmaxhp() const;
-	int					getprepared(skill_s id) const { return spell_prepared[id]; }
-	int					getprogress() const { return 4; }
-	int					getmovementexplore() const { return 120; }
-	int					getmovementwilderness() const { return getmovementexplore()/5; }
-	bool				isactive() const { return hp > 0; }
-	bool				islevelup() const;
-	bool				isplayer() const;
-	void				levelup(bool interactive);
-	int					roll(skill_s value) const;
-	void				setprepared(skill_s id, int value) { spell_prepared[id] = (unsigned char)value; }
+	operator bool() const { return traits[0]!=0; }
+	const char*			getname() const { return "Óëüğèê"; }
+	int					get(trait_s id) const { return traits[id]; }
+	int					get(knack_s id) const { return knacks[id]; }
 private:
-	short				hp, mhp;
-	int					experince;
-	item				wear[LastWear+1];
-	unsigned char		ability[Charisma + 1];
-	unsigned char		proficiency[LastSkill + 1];
-	unsigned char		spell_prepared[LastSkill + 1];
-	unsigned char		name;
+	char				traits[LastTrait + 1];
+	char				knacks[LastSorte + 1];
 };
-namespace game
-{
-	void				encounter(monster_s type, int count = -1);
-	unsigned char*		getattack(class_s id);
-	int					getdice(class_s id);
-	int*				getexperience(class_s type);
-	unsigned char*		getminimal(class_s id);
-	unsigned char		getmaximumlevel(class_s id);
-	dice				getmonstercount(monster_s id, encounter_type_s type);
-	const char*			getname(unsigned char index);
-	ability_s			getprime(class_s id);
-	race_s				getrace(class_s id);
-	unsigned char		getrandomname(race_s race, gender_s gender);
-	bool				isgameover();
-	void				travel(landscape_s landscape, int miles);
-}
-namespace logs
-{
-	struct state
-	{
-		const char*		information;
-		const creature*	opponent;
-		const creature*	player;
-		state();
-		~state();
-	};
-}
-extern logs::state		logc;
-extern creature*		players[7];
-char*					toupper(char* result, const char* format);
+extern adat<hero, 64>	heroes;
+extern hero*			players[6];
