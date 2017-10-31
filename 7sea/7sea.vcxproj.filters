@@ -1,17 +1,144 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Исходные файлы">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <ClInclude Include="adat.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="bitops.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="bstream.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="crt.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="dice.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="draw.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="io.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="pma.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="point.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="stringcreator.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="stringid.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="surface.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="win.h">
+      <Filter>Библиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="logs.h">
+      <Filter>Текстовый процесор</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Логика</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bitops.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="bstream.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="color.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="command.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="crt.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="crt_parse.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="dice.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_input.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_text.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_textf.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="io.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="pma.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="point.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="stringcreator.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="surface.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="surface_serial.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="win_draw.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="win_io_file.cpp">
+      <Filter>Библиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="logs.cpp">
+      <Filter>Текстовый процесор</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="print.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Библиотека">
+      <UniqueIdentifier>{ae4a14e7-f471-43e6-bea4-9358f0940f1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы заголовков">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Текстовый процесор">
+      <UniqueIdentifier>{92fe0535-509e-477c-894f-3640d93d77cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы ресурсов">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Логика">
+      <UniqueIdentifier>{c7481801-7fa5-49e9-bd9e-3ac3de2c2b68}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
