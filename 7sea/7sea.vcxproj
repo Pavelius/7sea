@@ -146,6 +146,8 @@
     <ClCompile Include="draw_input.cpp" />
     <ClCompile Include="draw_text.cpp" />
     <ClCompile Include="draw_textf.cpp" />
+    <ClCompile Include="hero.cpp" />
+    <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="io.cpp" />
     <ClCompile Include="knack.cpp" />
     <ClCompile Include="logs.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="stringcreator.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="surface_serial.cpp" />
+    <ClCompile Include="trait.cpp" />
     <ClCompile Include="win_draw.cpp" />
     <ClCompile Include="win_io_file.cpp" />
   </ItemGroup>

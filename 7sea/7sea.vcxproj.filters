@@ -132,6 +132,15 @@
     <ClCompile Include="knack.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="hero_create.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="trait.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="hero.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Библиотека">

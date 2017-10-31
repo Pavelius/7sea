@@ -56,7 +56,7 @@ static struct knack_i
 	{{"Strategy", "Стратегия"}},
 	{{"Tactics", "Тактика"}},
 	{{"Attack (сrossbow)", "Атака (арбалет)"}},
-	{{"", "Атака (грязный бой)"}},
+	{{"Attack (dirty fighting)", "Атака (грязный бой)"}},
 	{{"Attack (fencing)", "Атака (фехтование)"}},
 	{{"Parry (fencing)", "Парировать (фехтование)"}},
 	{{"Attack (firearms)", "Атака (огнестрельное оружие)"}},

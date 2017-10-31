@@ -163,6 +163,8 @@ struct hero
 	family_s			family;
 	gender_s			gender;
 	operator bool() const { return traits[0]!=0; }
+	void				choosetraits(bool interactive);
+	void				clear();
 	const char*			getname() const { return "Óëüğèê"; }
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
