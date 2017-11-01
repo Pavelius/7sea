@@ -161,7 +161,9 @@ void hero::chooseadvantage(bool interactive, char* skills)
 				continue;
 			logs::add(i, "%1 (стоит [%2i] %3).", getstr(i), cost, maptbl(text_points, cost));
 		}
-		if(logs::getcount())
+		if(!logs::getcount())
+			logs::clear();
+		else
 		{
 			auto result = (advantage_s)logs::input(interactive, true, "Выбирайте [одно] преемущество из списка ниже");
 			experience -= getcost(result);
@@ -184,7 +186,10 @@ void hero::choosecivilskills(bool interactive, char* skills)
 				logs::add(i, getstr(i));
 		}
 		if(!logs::getcount())
+		{
+			logs::clear();
 			break;
+		}
 		logs::sort();
 		auto result = (skill_s)logs::input(interactive, true, "Кто вы по профессии? (осталось [%1i], каждый навык стоит [%2i] %3)",
 			count--, getcost(Artist), maptbl(text_points, getcost(Artist)));
@@ -205,7 +210,10 @@ void hero::choosecombatskills(bool interactive, char* skills)
 			logs::add(i, "%1. Стоит [%2i] %3.", getstr(i), cost, maptbl(text_points, cost));
 	}
 	if(!logs::getcount())
+	{
+		logs::clear();
 		return;
+	}
 	logs::sort();
 	logs::add(500, "Никаким. Военные навыки мне ни к чему.");
 	auto id = logs::input(interactive, true, "Каким военным навыком вы владеете?");
