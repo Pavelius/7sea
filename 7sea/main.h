@@ -177,7 +177,9 @@ struct hero
 	family_s			family;
 	gender_s			gender;
 	short				experience;
+	//
 	operator bool() const { return traits[0]!=0; }
+	//
 	void				create(bool interactive);
 	void				clear();
 	void				endsession();
@@ -192,21 +194,22 @@ struct hero
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
-	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* return_result = 0);
+	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int roll_bonus = 0, int keep_bonus = 0, int bonus = 0, int* return_result = 0);
+	void				set(knack_s id, int value) { knacks[id] = value; }
 	void				usedrama();
 private:
+	char				advantages[LastAdvantage + 1];
+	char				knacks[LastSorte + 1];
+	char				traits[LastTrait + 1];
 	char				swordsman, sorcery;
 	char				dramawound, dramadice;
-	char				advantages[LastAdvantage + 1];
-	char				traits[LastTrait + 1];
-	char				knacks[LastSorte + 1];
 	//
 	void				chooseadvantage(bool interactive, char* skills);
+	void				choosecivilskills(bool interactive, char* skills);
+	void				choosecombatskills(bool interactive, char* skills);
 	void				choosegender(bool interactive);
 	void				choosenation(bool interactive);
 	void				choosesorcery(bool interactive);
-	void				choosecivilskills(bool interactive, char* skills);
-	void				choosecombatskills(bool interactive, char* skills);
 	void				choosetraits(bool interactive);
 	void				set(advantage_s value, bool interactive, char* skills);
 	void				set(nation_s value);

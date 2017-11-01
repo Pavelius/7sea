@@ -6,7 +6,8 @@ int	main(int argc, char *argv[])
 	logs::open("7 sea");
 	hero player;
 	player.create(false);
-	player.roll(true, 5, 3, 0);
+	player.set(AttackFencing, 1);
+	player.roll(true, Finesse, AttackFencing, 25, 5*1);
 	return 0;
 }
 

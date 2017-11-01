@@ -84,12 +84,19 @@ static char* add_result(char* result, int keep, char* dices)
 	return zend(result);
 }
 
-static char* print_result(char* p, char* dices, int keep, int value)
+static char* print_result(char* p, char* dices, int keep, int value, int bonus)
 {
-	zcpy(p, "Вы выбросили: ");
+	zcpy(p, "Результат: ");
 	add_result(zend(p), keep, dices);
 	zcat(p, ". ");
-	szprint(zend(p), "Результат броска [%1i].", value);
+	szprint(zend(p), "В сумме [%1i]. ", value);
+	return p;
+}
+
+static char* print_result(char* p, char* dices, int keep, int value, int bonus, hero* player, trait_s trait, knack_s knack, int tn)
+{
+	szprint(p, "%1 бросает [%2]+[%3] против сложности [%4i]. ", player->getname(), getstr(trait), getstr(knack), tn);
+	auto pp = print_result(zend(p), dices, keep, value, bonus);
 	return p;
 }
 
@@ -118,7 +125,7 @@ void hero::usedrama()
 	}
 }
 
-bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus, int* return_result)
+bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_number, int roll_bonus, int keep_bonus, int bonus, int* return_result)
 {
 	char temp[512];
 	char dices[10];
@@ -130,13 +137,18 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 		return result;
 	while(true)
 	{
-		logs::add(KeepResult, "Принять результат");
+		if(result>=target_number)
+			logs::add(KeepResult, "Принять [+удачный] результат");
+		else
+			logs::add(KeepResult, "Принять [-не удачный] результат");
 		if(dramadice)
 			logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", dramadice);
-		auto id = (result_aciton_s)logs::input(true, true, print_result(temp, dices, k, result));
+		auto id = (result_aciton_s)logs::input(true, true, print_result(temp, dices, k, result, bonus, this, trait, knack, target_number));
 		switch(id)
 		{
 		case KeepResult:
+			if(return_result)
+				*return_result = result;
 			return result;
 		case UseDramaDice:
 			usedrama();
@@ -146,9 +158,4 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 			break;
 		}
 	}
-}
-
-bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_number, int* return_result)
-{
-	auto result = roll(interactive, get(trait), get(knack), 0);
 }
