@@ -38,8 +38,9 @@ static struct skill_i
 assert_enum(skill, LastSkill);
 getstr_enum(skill);
 
-void hero::set(skill_s value, bool interacive)
+void hero::set(skill_s value, bool interacive, char* skills)
 {
+	skills[value]++;
 	switch(value)
 	{
 	case Hunter:
@@ -53,4 +54,24 @@ void hero::set(skill_s value, bool interacive)
 			knacks[e]++;
 		break;
 	}
+}
+
+int hero::getcost(skill_s value) const
+{
+	if(game::iscivil(value))
+	{
+		if(get(University))
+			return 1;
+	}
+	else
+	{
+		if(get(Academy))
+			return 1;
+	}
+	return 2;
+}
+
+bool game::iscivil(skill_s value)
+{
+	return value >= Artist && value <= Streetwise;
 }

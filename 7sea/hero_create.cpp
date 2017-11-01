@@ -74,6 +74,7 @@ void hero::choosenation(bool interactive)
 	print_hero(this);
 	for(auto i = FirstNation; i <= LastNation; i = (nation_s)(i + 1))
 		logs::add(i, "[%1]: %2", getstr(i), getinfo(i));
+	logs::sort();
 	nation = (nation_s)logs::input(interactive, true, "Откуда вы родом?");
 }
 
@@ -96,34 +97,37 @@ void hero::choosetraits(bool interactive)
 	experience = 100 - 8 * (5 + 2);
 }
 
-void hero::chooseadvantage(bool interactive)
+void hero::choosesorcery(bool interactive)
 {
-	if(getsorcery())
+	auto value = getsorcery();
+	if(value == NoSorcery)
+		return;
+	if(value == Sorte && gender == Male)
+		return;
+	print_hero(this);
+	logs::add(0, "Нет, среди моих предков на памяти не было волшебников.");
+	if(experience >= 20)
+		logs::add(1, "Да. У нас в роду были люди, которые владели волшебством [%1]. Выходит я полукровный волшеник. Это стоит [20] очков.", getstr(value));
+	if(experience >= 40)
+		logs::add(2, "Один из моих родителей владел волшебством [%1], которому он научился у своих родителей. У нас в семье это сильная традиция, поэтому я могу считаться полнокровным волшебником. Это стоит [40] очков.", getstr(value));
+	sorcery = logs::input(interactive, true, "В вашей семье есть предки, владевшие волшебством?");
+	switch(sorcery)
 	{
-		auto value = getsorcery();
-		print_hero(this);
-		logs::add("Ваши родители владели волшебством?");
-		logs::add(0, "Нет, мои родители не владели волшебством.");
-		if(experience >= 20)
-			logs::add(1, "Да. Один из них был волшебником, поэтому я буду владеть волшебством [%1] на базовом уровне. Это стоит [20] очков.", getstr(value));
-		if(experience >= 40)
-			logs::add(2, "Оба моих родителя были волшебниками, поэтому я буду весьма способным волшебником [%1]. Это стоит [40] очков.", getstr(value));
-		sorcery = logs::input();
-		switch(sorcery)
-		{
-		case 1: experience -= 20; break;
-		case 2: experience -= 40; break;
-		}
+	case 1: experience -= 20; break;
+	case 2: experience -= 40; break;
 	}
+}
+
+void hero::chooseadvantage(bool interactive, char* skills)
+{
 	if(getswordsman())
 	{
 		auto value = getswordsman();
 		print_hero(this);
-		logs::add("Вы входите в школу фехтовальщиков [%1]?", getstr(value));
 		logs::add(0, "Нет, я получил обучение военным навыкам на базовом уровне.");
 		if(experience >= 25)
 			logs::add(1, "Да. Я вхожу в школу фехтовальщиков [%1]. Это стоит [25] очков.", getstr(value));
-		swordsman = logs::input();
+		swordsman = logs::input(interactive, true, "Вы входите в школу фехтовальщиков [%1]", getstr(value));
 		switch(swordsman)
 		{
 		case 1: experience -= 25; break;
@@ -161,26 +165,50 @@ void hero::chooseadvantage(bool interactive)
 		{
 			auto result = (advantage_s)logs::input(interactive, true, "Выбирайте [одно] преемущество из списка ниже");
 			experience -= getcost(result);
-			set(result);
+			set(result, interactive, skills);
 		}
 	}
 }
 
-void hero::chooseskills(bool interactive)
+void hero::chooseskills(bool interactive, char* skills)
 {
-	print_hero(this);
-	for(auto i = Artist; i <= Streetwise; i = (skill_s)(i + 1))
-		logs::add(i, getstr(i));
-	auto result = (skill_s)logs::input(interactive, true, "Кто вы по профессии?");
-	set(result, interactive);
+	auto count = 2;
+	while(count > 0)
+	{
+		print_hero(this);
+		for(auto i = Artist; i <= Streetwise; i = (skill_s)(i + 1))
+		{
+			if(skills[i])
+				continue;
+			if(getcost(i)<=experience)
+				logs::add(i, getstr(i));
+		}
+		if(!logs::getcount())
+			break;
+		logs::sort();
+		auto result = (skill_s)logs::input(interactive, true, "Кто вы по профессии? (осталось [%1i], каждый навык стоит [%2i] %3)",
+			count--, getcost(Artist), maptbl(text_points, getcost(Artist)));
+		experience -= getcost(result);
+		set(result, interactive, skills);
+	}
+}
+
+void hero::choosegender(bool interactive)
+{
+	logs::add(Male, "Мужчина");
+	logs::add(Female, "Женщина");
+	gender = (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 
 void hero::create(bool interactive)
 {
+	char skills[LastSkill + 1] = {0};
 	clear();
+	choosegender(interactive);
 	choosenation(interactive);
 	choosetraits(interactive);
 	set(nation);
-	chooseadvantage(interactive);
-	chooseskills(interactive);
+	choosesorcery(interactive);
+	chooseadvantage(interactive, skills);
+	chooseskills(interactive, skills);
 }

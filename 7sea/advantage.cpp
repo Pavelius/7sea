@@ -11,7 +11,7 @@ struct advantage_i
 	{{"Academy", "Военная академия"}, 4},
 	{{"Appearance", "Внешность"}, 5},
 	{{"Castillian Education", "Кастильское образование"}, 10},
-	{{"Citation", "Награда"}, 4, {}, {1, Scoundrel}},
+	{{"Citation", "Награда"}, 4, {}, {1, {Scoundrel}}},
 	{{"Combat Reflexes", "Боевые рефлексы"}, 3},
 	{{"Commissions", "Военное звание"}, 4},
 	{{"Dangerous beauty", "Убийственная красота"}, 5},
@@ -22,9 +22,9 @@ struct advantage_i
 	{{"Large", "Большой"}, 5, {}, {1, Small}},
 	{{"Linguist", "Лингвист"}, 2},
 	{{"Noble", "Дворянин"}, 10},
-	{{"Ordained", "Духовный сан"}, 4, {1, Scholar}},
-	{{"Scoundrel", "Негодяй"}, 3, {1, Streetwise}, {1, Citation}},
-	{{"Small", "Карлик"}, 2, {}, {1, Large}},
+	{{"Ordained", "Духовный сан"}, 4, {1, {Scholar}}},
+	{{"Scoundrel", "Негодяй"}, 3, {1, {Streetwise}}, {1, {Citation}}},
+	{{"Small", "Карлик"}, 2, {}, {1, {Large}}},
 	{{"Toughness", "Живучий"}, 5},
 	{{"University", "Университет"}, 3},
 };
@@ -42,7 +42,9 @@ int	hero::getcost(advantage_s id) const
 	}
 }
 
-void hero::set(advantage_s value)
+void hero::set(advantage_s value, bool interactive, char* skills)
 {
 	advantages[value]++;
+	for(auto e : advantage_data[value].skills)
+		set(e, interactive, skills);
 }

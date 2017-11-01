@@ -185,6 +185,7 @@ struct hero
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
 	int					getcost(advantage_s id) const;
+	int					getcost(skill_s value) const;
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	bool				issorcery() const { return sorcery != 0; }
@@ -192,18 +193,23 @@ struct hero
 private:
 	char				swordsman, sorcery;
 	char				advantages[LastAdvantage + 1];
-	char				skills[LastSkill + 1];
 	char				traits[LastTrait + 1];
 	char				knacks[LastSorte + 1];
 	//
-	void				chooseadvantage(bool interactive);
+	void				chooseadvantage(bool interactive, char* skills);
+	void				choosegender(bool interactive);
 	void				choosenation(bool interactive);
-	void				chooseskills(bool interactive);
+	void				choosesorcery(bool interactive);
+	void				chooseskills(bool interactive, char* skills);
 	void				choosetraits(bool interactive);
-	void				set(advantage_s value);
+	void				set(advantage_s value, bool interactive, char* skills);
 	void				set(nation_s value);
-	void				set(skill_s value, bool interactive);
+	void				set(skill_s value, bool interactive, char* skills);
 };
+namespace game
+{
+	bool				iscivil(skill_s value);
+}
 extern adat<hero, 64>	heroes;
 extern hero*			players[6];
 template<class T> const char* getinfo(T e);
