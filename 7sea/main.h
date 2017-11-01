@@ -196,11 +196,13 @@ private:
 	char				traits[LastTrait + 1];
 	char				knacks[LastSorte + 1];
 	//
-	void				applynation();
 	void				chooseadvantage(bool interactive);
 	void				choosenation(bool interactive);
 	void				chooseskills(bool interactive);
 	void				choosetraits(bool interactive);
+	void				set(advantage_s value);
+	void				set(nation_s value);
+	void				set(skill_s value, bool interactive);
 };
 extern adat<hero, 64>	heroes;
 extern hero*			players[6];

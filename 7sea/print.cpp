@@ -2,5 +2,5 @@
 
 const char* logs::getpanel(int index)
 {
-	return "";
+	return 0;
 }

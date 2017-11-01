@@ -37,3 +37,20 @@ static struct skill_i
 };
 assert_enum(skill, LastSkill);
 getstr_enum(skill);
+
+void hero::set(skill_s value, bool interacive)
+{
+	switch(value)
+	{
+	case Hunter:
+		break;
+	case Artist:
+		break;
+	case Merchant:
+		break;
+	default:
+		for(auto e : skill_data[value].knacks)
+			knacks[e]++;
+		break;
+	}
+}

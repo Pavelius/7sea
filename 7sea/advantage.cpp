@@ -41,3 +41,8 @@ int	hero::getcost(advantage_s id) const
 	default: return advantage_data[id].cost;
 	}
 }
+
+void hero::set(advantage_s value)
+{
+	advantages[value]++;
+}

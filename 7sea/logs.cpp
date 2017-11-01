@@ -161,8 +161,20 @@ int wdt_answers(int x, int y, int width, const char* name, int id, const char* l
 {
 	auto column_count = 1 + answers.count / 13;
 	auto medium_width = width / column_count;
-	if(column_count>1 && medium_width > 220)
-		medium_width = 220;
+	if(column_count > 1 && medium_width > 200)
+	{
+		unsigned text_width = 0;
+		auto glyph_width = draw::textw("a");
+		for(auto& e : answers)
+		{
+			unsigned w = zlen(e.text)*glyph_width;
+			if(w > text_width)
+				text_width = w;
+		}
+		text_width += text_width / 10;
+		if(text_width<medium_width)
+			medium_width = text_width;
+	}
 	auto column_width = medium_width - metrics::padding;
 	auto rows_count = answers.count / column_count;
 	auto index = 0;
@@ -268,7 +280,7 @@ int logs::inputv(bool interactive, bool clear_text, const char* format, const ch
 	char* p = zend(logs::content);
 	while(p > content && p[-1] == '\n')
 		*--p = 0;
-	if(format && format[0])
+	if(format && format[0] && interactive)
 	{
 		if(p != content)
 			zcat(p, "\n");

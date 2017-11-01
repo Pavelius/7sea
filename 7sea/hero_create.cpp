@@ -2,7 +2,7 @@
 
 static const char* text_points[] = {"очков", "очко", "очка", "очка", "очка", "очков"};
 
-static char* add(char* p, char* result, const char* title, const char* name, int value)
+static char* add(char* p, char* result, const char* title, const char* name, int value, int minimal_number = 1)
 {
 	if(!value)
 		return p;
@@ -10,7 +10,7 @@ static char* add(char* p, char* result, const char* title, const char* name, int
 		szprint(p, "%1: ", title);
 	else
 		zcat(p, ", ");
-	p = szprint(zend(p), "%1 %2i", name, value);
+	p = szprint(zend(p), (value>=minimal_number) ? "%1 %2i" : "%1", name, value);
 	return zend(p);
 }
 
@@ -40,9 +40,23 @@ static char* add_knacks(char* result, hero* player, const char* end)
 	return p;
 }
 
+static char* add_advantages(char* result, hero* player, const char* end)
+{
+	auto p = result;
+	for(auto i = FirstAdvantage; i <= LastAdvantage; i = (advantage_s)(i + 1))
+		p = add(p, result, "Преемущества", getstr(i), player->get(i), 2);
+	if(p != result)
+	{
+		zcat(p, end);
+		p = zend(p);
+	}
+	return p;
+}
+
 static void add_hero(char* result, hero* player)
 {
 	auto p = add_traits(result, player, "\n");
+	p = add_advantages(p, player, "\n");
 	p = add_knacks(p, player, "\n");
 	if(player->experience)
 		szprint(p, "У вас осталось [%1i] очков.", player->experience);
@@ -146,15 +160,19 @@ void hero::chooseadvantage(bool interactive)
 		if(logs::getcount())
 		{
 			auto result = (advantage_s)logs::input(interactive, true, "Выбирайте [одно] преемущество из списка ниже");
-			advantages[result]++;
 			experience -= getcost(result);
+			set(result);
 		}
 	}
 }
 
 void hero::chooseskills(bool interactive)
 {
-
+	print_hero(this);
+	for(auto i = Artist; i <= Streetwise; i = (skill_s)(i + 1))
+		logs::add(i, getstr(i));
+	auto result = (skill_s)logs::input(interactive, true, "Кто вы по профессии?");
+	set(result, interactive);
 }
 
 void hero::create(bool interactive)
@@ -162,6 +180,7 @@ void hero::create(bool interactive)
 	clear();
 	choosenation(interactive);
 	choosetraits(interactive);
-	applynation();
+	set(nation);
 	chooseadvantage(interactive);
+	chooseskills(interactive);
 }

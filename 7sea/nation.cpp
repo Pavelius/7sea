@@ -34,7 +34,7 @@ swordsman_s hero::getswordsman() const
 	return nation_data[nation].swordsman;
 }
 
-void hero::applynation()
+void hero::set(nation_s value)
 {
-	traits[nation_data[nation].trait]++;
+	traits[nation_data[value].trait]++;
 }
