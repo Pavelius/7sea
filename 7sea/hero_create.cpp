@@ -141,7 +141,7 @@ void hero::chooseadvantage(bool interactive, char* skills)
 		logs::add(0, "Нет, я простой ремесленник, рабочий или крестьянин.");
 		if(experience >= cost)
 			logs::add(1, "Да. Я родом из знатной семьи дворян. Это стоит [%1i] очков.", cost);
-		if(logs::input())
+		if(logs::input(interactive))
 		{
 			advantages[Noble] = 1;
 			experience -= cost;
@@ -170,7 +170,7 @@ void hero::chooseadvantage(bool interactive, char* skills)
 	}
 }
 
-void hero::chooseskills(bool interactive, char* skills)
+void hero::choosecivilskills(bool interactive, char* skills)
 {
 	auto count = 2;
 	while(count > 0)
@@ -193,6 +193,29 @@ void hero::chooseskills(bool interactive, char* skills)
 	}
 }
 
+void hero::choosecombatskills(bool interactive, char* skills)
+{
+	print_hero(this);
+	for(auto i = Archer; i <= LastSkill; i = (skill_s)(i + 1))
+	{
+		if(skills[i])
+			continue;
+		auto cost = getcost(i);
+		if(cost <= experience)
+			logs::add(i, "%1. Стоит [%2i] %3.", getstr(i), cost, maptbl(text_points, cost));
+	}
+	if(!logs::getcount())
+		return;
+	logs::sort();
+	logs::add(500, "Никаким. Военные навыки мне ни к чему.");
+	auto id = logs::input(interactive, true, "Каким военным навыком вы владеете?");
+	if(id == 500)
+		return;
+	auto result = (skill_s)id;
+	experience -= getcost(result);
+	set(result, interactive, skills);
+}
+
 void hero::choosegender(bool interactive)
 {
 	logs::add(Male, "Мужчина");
@@ -210,5 +233,7 @@ void hero::create(bool interactive)
 	set(nation);
 	choosesorcery(interactive);
 	chooseadvantage(interactive, skills);
-	chooseskills(interactive, skills);
+	choosecivilskills(interactive, skills);
+	choosecombatskills(interactive, skills);
+	endsession();
 }

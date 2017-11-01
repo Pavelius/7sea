@@ -180,7 +180,8 @@ struct hero
 	operator bool() const { return traits[0]!=0; }
 	void				create(bool interactive);
 	void				clear();
-	const char*			getname() const { return "Ульрик"; }
+	void				endsession();
+	const char*			getname() const { return "Алонсо"; }
 	int					get(advantage_s id) const { return advantages[id]; }
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
@@ -188,10 +189,14 @@ struct hero
 	int					getcost(skill_s value) const;
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
+	bool				iscripled() const { return dramawound >= traits[Resolve]; }
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
+	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* return_result = 0);
+	void				usedrama();
 private:
 	char				swordsman, sorcery;
+	char				dramawound, dramadice;
 	char				advantages[LastAdvantage + 1];
 	char				traits[LastTrait + 1];
 	char				knacks[LastSorte + 1];
@@ -200,7 +205,8 @@ private:
 	void				choosegender(bool interactive);
 	void				choosenation(bool interactive);
 	void				choosesorcery(bool interactive);
-	void				chooseskills(bool interactive, char* skills);
+	void				choosecivilskills(bool interactive, char* skills);
+	void				choosecombatskills(bool interactive, char* skills);
 	void				choosetraits(bool interactive);
 	void				set(advantage_s value, bool interactive, char* skills);
 	void				set(nation_s value);
