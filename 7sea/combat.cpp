@@ -22,6 +22,19 @@ static struct brute_i
 	const char*		name[3];
 	char			threat;
 	knackset		skills[8];
+
+	int get(knack_s id) const
+	{
+		for(auto& e : skills)
+		{
+			if(e.id == id)
+				return e.value;
+			if(!e)
+				break;
+		}
+		return 0;
+	}
+
 } brute_data[] = {
 	{{"Cardinal's mens", "Люди кардинала", "Человек кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
@@ -42,6 +55,14 @@ struct combatant
 			return player->get(id);
 		else
 			return brute->threat;
+	}
+
+	int get(knack_s id) const
+	{
+		if(player)
+			return player->get(id);
+		else
+			return brute->get(id);
 	}
 
 	int getactions() const
@@ -156,6 +177,12 @@ static void make_move(combatant* player)
 	auto attack_knack = AttackFencing;
 	auto defence_knack = Footwork;
 	add(player, Finesse, attack_knack, interactive, enemies, 0, 0, "Атаковать врага [рапирой].");
+	if(player->get(Riposte))
+		add(player, Finesse, attack_knack, interactive, enemies, 0, 0, "Атаковать врага [рапирой].");
+	if(player->get(Beat))
+		add(player, Finesse, Beat, interactive, enemies, 0, 0, "Нанести мощнейший удар, который пробьет защиту врага.");
+	if(player->get(PommelStrike))
+		add(player, Finesse, PommelStrike, interactive, enemies, 0, 0, "Нанести неожиданный удар ручкой оружия в лицо.");
 	auto id = logs::input(interactive, true, "Что будет делать [%1]?", player->getname());
 	if(id >= FirstAction && id <= LastAction)
 	{
