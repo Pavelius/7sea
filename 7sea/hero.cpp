@@ -134,7 +134,7 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 	auto r = k + get(knack);
 	auto result = rolldices(dices, r, k, bonus, !iscripled());
 	if(!interactive)
-		return result;
+		return result>=target_number;
 	while(true)
 	{
 		if(result>=target_number)
@@ -149,7 +149,7 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 		case KeepResult:
 			if(return_result)
 				*return_result = result;
-			return result;
+			return result>=target_number;
 		case UseDramaDice:
 			usedrama();
 			roll_result = rolldice(true);
