@@ -180,7 +180,7 @@ struct hero
 	//
 	operator bool() const { return traits[0]!=0; }
 	//
-	void				create(bool interactive);
+	void				create(bool interactive, bool add_to_players = true);
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
 	void				clear();
 	void				endsession();
@@ -233,14 +233,25 @@ struct roller
 	hero*				player;
 	roller();
 	char*				getheader(char* temp) const;
-	bool				makeroll(bool interactive);
 	void				rolldices();
+	bool				standart(bool interactive);
 	void				usedrama();
 };
+namespace logs
+{
+	struct state
+	{
+		const char*		information;
+		state();
+		~state();
+	};
+}
 namespace game
 {
+	void				combat();
 	bool				iscivil(skill_s value);
 }
 extern adat<hero, 64>	heroes;
+extern logs::state		logc;
 extern hero*			players[6];
 template<class T> const char* getinfo(T e);

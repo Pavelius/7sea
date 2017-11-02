@@ -30,8 +30,6 @@ stringcreator::plugin::element* stringcreator::plugin::find(const char* name)
 
 void stringcreator::parseidentifier(char* result, const char* result_max, const char* identifier)
 {
-	if(!plugin::first)
-		return;
 	auto p = plugin::find(identifier);
 	if(p)
 		p->proc(result);

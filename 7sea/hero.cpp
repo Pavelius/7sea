@@ -52,7 +52,7 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 	e.bonus = bonus;
 	e.target_number = target_number;
 	e.rolldices();
-	return e.makeroll(interactive);
+	return e.standart(interactive);
 }
 
 bool hero::contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus)
@@ -68,7 +68,7 @@ bool hero::contest(bool interactive, trait_s trait, knack_s knack, int bonus, he
 		e1.bonus = bonus;
 		e1.target_number = opponent->get(opponent_trait) * 5;
 		e1.rolldices();
-		e1.makeroll(interactive && isplayer());
+		e1.standart(interactive && isplayer());
 		roller e2;
 		e2.player = opponent;
 		e2.trait = opponent_trait;
@@ -77,7 +77,7 @@ bool hero::contest(bool interactive, trait_s trait, knack_s knack, int bonus, he
 		e2.roll = e2.keep + opponent->get(knack);
 		e2.bonus = opponent_bonus;
 		e2.target_number = get(trait) * 5;
-		e2.makeroll(interactive && opponent->isplayer());
+		e2.standart(interactive && opponent->isplayer());
 		if(e1.result >= e1.target_number && e2.result < e2.target_number)
 			return true;
 		if(e2.result >= e2.target_number && e1.result < e1.target_number)

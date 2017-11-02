@@ -6,7 +6,7 @@ enum result_aciton_s {
 
 static int compare_dices(const void* p1, const void* p2)
 {
-	return *((char*)p2) - *((char*)p1);
+	return *((int*)p2) - *((int*)p1);
 }
 
 static char* add_result(char* result, int keep, const int* dices)
@@ -77,8 +77,8 @@ void roller::rolldices()
 		keep = 10;
 	}
 	// Keep dices correct
-	if(roll < keep)
-		roll = keep;
+	if(keep > roll)
+		keep = roll;
 	result = bonus;
 	if(roll == 0)
 	{
@@ -132,7 +132,7 @@ void roller::usedrama()
 	dices[0] += r;
 }
 
-bool roller::makeroll(bool interactive)
+bool roller::standart(bool interactive)
 {
 	char temp[512];
 	if(!interactive)

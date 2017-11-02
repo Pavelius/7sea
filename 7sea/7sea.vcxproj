@@ -139,6 +139,7 @@
     <ClCompile Include="bitops.cpp" />
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="color.cpp" />
+    <ClCompile Include="combat.cpp" />
     <ClCompile Include="command.cpp" />
     <ClCompile Include="crt.cpp" />
     <ClCompile Include="crt_parse.cpp" />

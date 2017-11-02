@@ -162,7 +162,7 @@ void hero::chooseadvantage(bool interactive, char* skills)
 			logs::add(i, "%1 (стоит [%2i] %3).", getstr(i), cost, maptbl(text_points, cost));
 		}
 		if(!logs::getcount())
-			logs::clear();
+			logs::clear(true);
 		else
 		{
 			auto result = (advantage_s)logs::input(interactive, true, "Выбирайте [одно] преемущество из списка ниже");
@@ -187,7 +187,7 @@ void hero::choosecivilskills(bool interactive, char* skills)
 		}
 		if(!logs::getcount())
 		{
-			logs::clear();
+			logs::clear(true);
 			break;
 		}
 		logs::sort();
@@ -211,7 +211,7 @@ void hero::choosecombatskills(bool interactive, char* skills)
 	}
 	if(!logs::getcount())
 	{
-		logs::clear();
+		logs::clear(true);
 		return;
 	}
 	logs::sort();
@@ -231,7 +231,7 @@ void hero::choosegender(bool interactive)
 	gender = (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 
-void hero::create(bool interactive)
+void hero::create(bool interactive, bool add_to_players)
 {
 	char skills[LastSkill + 1] = {0};
 	clear();
@@ -244,4 +244,6 @@ void hero::create(bool interactive)
 	choosecivilskills(interactive, skills);
 	choosecombatskills(interactive, skills);
 	endsession();
+	if(add_to_players)
+		zcat(players, this);
 }
