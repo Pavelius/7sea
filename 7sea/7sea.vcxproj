@@ -157,6 +157,7 @@
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="print.cpp" />
+    <ClCompile Include="roller.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="sorcery.cpp" />
     <ClCompile Include="sprite.cpp" />

@@ -171,6 +171,20 @@ enum family_s : unsigned char {
 	OBannon, OTool,
 	AllaisDuCrieus, DuMontaigne, FlauberDuDore, RicheDuParroise, LevequeDAur,
 };
+struct roller
+{
+	enum type_s {
+		TraitAndKnackRoll, TraitRoll
+	};
+	type_s				type;
+	int					dices[10], roll, keep, bonus;
+	bool				explose;
+	int					result;
+	trait_s				trait;
+	knack_s				knack;
+	roller();
+	void				rolldices();
+};
 struct hero
 {
 	nation_s			nation;

@@ -156,6 +156,9 @@
     <ClCompile Include="skill.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="roller.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Библиотека">
