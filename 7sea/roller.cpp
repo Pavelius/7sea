@@ -1,13 +1,39 @@
 #include "main.h"
 
-roller::roller()
-{
-	memset(this, 0, sizeof(*this));
-}
+enum result_aciton_s {
+	KeepResult, UseDramaDice,
+};
 
 static int compare_dices(const void* p1, const void* p2)
 {
 	return *((char*)p2) - *((char*)p1);
+}
+
+static char* add_result(char* result, int keep, const int* dices)
+{
+	for(int i = 0; i < 10; i++)
+	{
+		if(!dices[i])
+			break;
+		if(i)
+			zcat(result, ", ");
+		bool grayed = (i >= keep);
+		if(grayed)
+			zcat(result, "[~");
+		sznum(zend(result), dices[i]);
+		if(grayed)
+			zcat(result, "]");
+	}
+	return zend(result);
+}
+
+static char* print_result(char* p, const int* dices, int keep, int value, int bonus)
+{
+	zcpy(p, "Результат: ");
+	add_result(zend(p), keep, dices);
+	zcat(p, ". ");
+	szprint(zend(p), "В сумме [%1i]. ", value);
+	return p;
 }
 
 static char rolldice(bool explode)
@@ -26,6 +52,11 @@ static char rolldice(bool explode)
 		}
 	}
 	return result;
+}
+
+roller::roller()
+{
+	memset(this, 0, sizeof(*this));
 }
 
 void roller::rolldices()
@@ -65,5 +96,63 @@ void roller::rolldices()
 		// Get total result
 		for(int i = 0; i<keep; i++)
 			result += dices[i];
+	}
+}
+
+char* roller::getheader(char* temp) const
+{
+	temp[0] = 0;
+	if(player)
+		szprint(zend(temp), "%1 бросает", player->getname());
+	else
+		zcat(temp, "Бросьте");
+	switch(type)
+	{
+	case TraitRoll:
+		szprint(zend(temp), " [%1]", getstr(trait));
+		break;
+	case TraitAndKnackRoll:
+		szprint(zend(temp), " [%1] + [%2]", getstr(trait), getstr(knack));
+		break;
+	}
+	if(target_number)
+		szprint(zend(temp), " против сложности [%1i]", target_number);
+	zcat(temp, ". ");
+	auto pp = print_result(zend(temp), dices, keep, result, bonus);
+	return temp;
+}
+
+void roller::usedrama()
+{
+	if(!player)
+		return;
+	player->usedrama();
+	auto r = rolldice(true);
+	result += r;
+	dices[0] += r;
+}
+
+bool roller::makeroll(bool interactive)
+{
+	char temp[512];
+	if(!interactive)
+		return result >= target_number;
+	while(true)
+	{
+		if(result >= target_number)
+			logs::add(KeepResult, "Принять [+удачный] результат");
+		else
+			logs::add(KeepResult, "Принять [-не удачный] результат");
+		if(player->getdrama())
+			logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", player->getdrama());
+		auto id = (result_aciton_s)logs::input(true, true, getheader(temp));
+		switch(id)
+		{
+		case KeepResult:
+			return result >= target_number;
+		case UseDramaDice:
+			usedrama();
+			break;
+		}
 	}
 }

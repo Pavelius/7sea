@@ -171,20 +171,6 @@ enum family_s : unsigned char {
 	OBannon, OTool,
 	AllaisDuCrieus, DuMontaigne, FlauberDuDore, RicheDuParroise, LevequeDAur,
 };
-struct roller
-{
-	enum type_s {
-		TraitAndKnackRoll, TraitRoll
-	};
-	type_s				type;
-	int					dices[10], roll, keep, bonus;
-	bool				explose;
-	int					result;
-	trait_s				trait;
-	knack_s				knack;
-	roller();
-	void				rolldices();
-};
 struct hero
 {
 	nation_s			nation;
@@ -195,6 +181,7 @@ struct hero
 	operator bool() const { return traits[0]!=0; }
 	//
 	void				create(bool interactive);
+	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
 	void				clear();
 	void				endsession();
 	const char*			getname() const { return "Алонсо"; }
@@ -203,20 +190,22 @@ struct hero
 	int					get(knack_s id) const { return knacks[id]; }
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
+	int					getdrama() const;
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
+	bool				isplayer() const;
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
-	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int roll_bonus = 0, int keep_bonus = 0, int bonus = 0, int* return_result = 0);
+	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0);
 	void				set(knack_s id, int value) { knacks[id] = value; }
 	void				usedrama();
 private:
 	char				advantages[LastAdvantage + 1];
 	char				knacks[LastSorte + 1];
 	char				traits[LastTrait + 1];
-	char				swordsman, sorcery;
 	char				dramawound, dramadice;
+	char				swordsman, sorcery;
 	//
 	void				chooseadvantage(bool interactive, char* skills);
 	void				choosecivilskills(bool interactive, char* skills);
@@ -228,6 +217,25 @@ private:
 	void				set(advantage_s value, bool interactive, char* skills);
 	void				set(nation_s value);
 	void				set(skill_s value, bool interactive, char* skills);
+};
+struct roller
+{
+	enum type_s {
+		TraitAndKnackRoll, TraitRoll
+	};
+	type_s				type;
+	int					dices[10], roll, keep, bonus;
+	bool				explose;
+	int					result;
+	int					target_number;
+	trait_s				trait;
+	knack_s				knack;
+	hero*				player;
+	roller();
+	char*				getheader(char* temp) const;
+	bool				makeroll(bool interactive);
+	void				rolldices();
+	void				usedrama();
 };
 namespace game
 {
