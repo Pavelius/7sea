@@ -2,26 +2,19 @@
 #include "stringcreator.h"
 #include "command.h"
 
-enum side_s : char {
-	PartySide, EnemySide,
-};
-enum combat_command_s {
-	FirstAction, LastAction = FirstAction + 32,
-};
+const unsigned combatant_count = 32;
 
-static char			round, phase;
-
-struct knackset
-{
-	knack_s			id;
-	char			value;
-	operator bool() const { return value != 0; }
-};
 static struct brute_i
 {
-	const char*		name[3];
-	char			threat;
-	knackset		skills[8];
+	struct knackset
+	{
+		knack_s			id;
+		char			value;
+		operator bool() const { return value != 0; }
+	};
+	const char*			name[3];
+	char				threat;
+	knackset			skills[8];
 
 	int get(knack_s id) const
 	{
@@ -39,15 +32,20 @@ static struct brute_i
 	{{"Cardinal's mens", "Люди кардинала", "Человек кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
 
+static char			round, phase;
+
 struct combatant
 {
-	char		actions[10];
-	brute_i*	brute;
-	int			count;
-	hero*		player;
-	side_s		side;
+	char			actions[10];
+	brute_i*		brute;
+	int				count;
+	hero*			player;
+	side_s			side;
 
-	operator bool() const { return count!=0; }
+	operator bool() const { return count != 0; }
+	typedef bool (combatant::*isproc)() const;
+	typedef bool (combatant::*isprocp)(const combatant* p) const;
+	typedef int (combatant::*getproc)() const;
 
 	int get(trait_s id) const
 	{
@@ -89,28 +87,52 @@ struct combatant
 		return brute->name[1];
 	}
 
+	bool ishero() const
+	{
+		return player != 0;
+	}
+
+	bool isfencing() const
+	{
+		return player != 0 && true;
+	}
+
+	bool isenemy(const combatant* p) const
+	{
+		return side != p->side;
+	}
+
+	knack_s getdefence() const
+	{
+		return Footwork;
+	}
+
+	int getpassivedefence() const
+	{
+		if(brute)
+			return (1 + brute->threat) * 5;
+		auto knack = getdefence();
+		return (1 + player->get(knack));
+	}
+
 	void useaction()
 	{
 		memcpy(actions, actions + 1, sizeof(actions) - 1);
 		actions[sizeof(actions) - 1] = 0;
 	}
 
-};
-static adat<combatant, 32> combatants;
-
-struct action
-{
-	combatant*		player;
-	trait_s			trait;
-	knack_s			knack;
-	char			raises;
-	combatant*		enemy;
-	action()
+	void damage(int wounds, int raises = 0)
 	{
-		memset(this, 0, sizeof(*this));
+		if(brute)
+			count -= 1 + raises;
+		else
+			player->damage(wounds, true);
+		if(count < 0)
+			count = 0;
 	}
+
 };
-static adat<action,32>	actions;
+static adat<combatant, combatant_count> combatants;
 
 static int compare_dices(const void* p1, const void* p2)
 {
@@ -139,56 +161,154 @@ static void add(brute_i* object, side_s side = EnemySide)
 	p->side = side;
 }
 
-static combatant* choose(bool interactive, combatant** targets)
+static combatant* choose(bool interactive, combatant** targets, combatant::getproc gettn)
 {
 	if(targets[0] == 0)
 		return 0;
 	if(targets[1] == 0)
 		return targets[0];
 	for(auto i = 0; targets[i]; i++)
-		logs::add(i, targets[i]->getname());
+	{
+		if(gettn)
+			logs::add(i, "%1 (сложность [%2i])", targets[i]->getname(), (targets[i]->*gettn)());
+		else
+			logs::add(i, targets[i]->getname());
+	}
 	auto i = logs::input(interactive, true, "Укажите [цель]:");
 	return targets[i];
 }
 
-static void add(combatant* actor, trait_s trait, knack_s knack, bool interactive, combatant** enemies, char raises, combatant* target, const char* format, ...)
+static bool ishero(const combatant* p)
 {
-	auto p = actions.add();
-	logs::addv(actions.count - 1 + FirstAction, format, xva_start(format));
+	return p->player != 0;
 }
 
-static action getaction(int id)
+static bool isfencing(const combatant* p)
 {
-	actions.count = 0;
-	return actions.data[id - FirstAction];
+	return p->player && true;
 }
+
+static combatant** select(combatant** result, combatant** source, combatant::isproc validate, unsigned count = combatant_count - 1)
+{
+	auto ps = result;
+	auto pe = result + count;
+	for(auto p = source; *p; p++)
+	{
+		if(validate && !((*p)->*validate)())
+			continue;
+		if(ps < pe)
+			*ps++ = *p;
+	}
+	*ps = 0;
+	return result;
+}
+
+static combatant** select(combatant** result, combatant::isprocp validate, const combatant* param, unsigned count = combatant_count - 1)
+{
+	auto ps = result;
+	auto pe = result + count;
+	for(auto& e : combatants)
+	{
+		if(!(e.*validate)(param))
+			continue;
+		if(ps < pe)
+			*ps++ = &e;
+	}
+	*ps = 0;
+	return result;
+}
+
+static bool has(combatant** enemies, combatant::isproc validate)
+{
+	combatant* result[2]; select(result, enemies, validate, 1);
+	return result[0] != 0;
+}
+
+static combatant* getenemy(bool interactive, combatant** enemies, knack_s knack, knack_s attack_knack)
+{
+	if(knack == attack_knack)
+		return choose(interactive, enemies, &combatant::getpassivedefence);
+	combatant* source[32];
+	return choose(interactive, select(source, enemies, &combatant::ishero), &combatant::getpassivedefence);
+}
+
+static struct action
+{
+	trait_s				trait;
+	knack_s				knack;
+	const char*			text;
+	combatant::isproc	validate;
+	operator bool() const { return text != 0; }
+} action_data[] = {
+	{Finesse, AttackBow, "Пустить стрелу из [лука]."},
+	{Finesse, AttackCrossbow, "Выстрелить из [арбалета]."},
+	{Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза."},
+	{Finesse, AttackFencing, "Атаковать врага [рапирой]."},
+	{Finesse, AttackFirearms, "Выстрелить из [пистоля]."},
+	{Finesse, AttackHeavyWeapon, "Рубить всех врагов [мечом]."},
+	{Finesse, AttackKnife, "Тыкнуть во врага [ножем]."},
+	{Finesse, AttackPanzerhand, "Нанести удар [металической рукой]."},
+	{Finesse, AttackPolearm, "Сделать тычек [копьем]."},
+	{Finesse, AttackPugilism, "Нанести удары кулаком и ногами."},
+	{Finesse, Beat, "Нанести сильный удар, который враг не сможет блокировать.", &combatant::ishero},
+	{Finesse, Bind, "Скрутить оружие врага.", &combatant::isfencing},
+	{Finesse, CorpseACorpse, "Сойтись в близкой схватке, тело к телу.", &combatant::ishero},
+	{Finesse, Feint, "Выполнить обманную атаку.", &combatant::ishero},
+	{Finesse, Lunge, "Нанести сокрушительный удар, который нанесет много урона.", &combatant::ishero},
+	{Finesse, PommelStrike, "Нанести удар гардой в лицо.", &combatant::ishero},
+	{Finesse, Togging, "Выполнить яркий и вызывающий трюк, который обозлит или унизит врага.", &combatant::ishero},
+};
 
 static void make_move(combatant* player)
 {
 	bool interactive = (player->player && player->player->isplayer());
-	combatant* enemies[sizeof(combatants) / sizeof(combatants[0]) + 1]; enemies[0] = 0;
-	for(auto& e : combatants)
-	{
-		if(player->side != e.side)
-			zcat(enemies, &e);
-	}
+	combatant* enemies[combatant_count + 1];
+	select(enemies, &combatant::isenemy, player, sizeof(enemies) / sizeof(enemies[0]) - 1);
+	auto enemies_count = zlen(enemies);
 	if(!enemies[0])
 		return;
-	auto attack_knack = AttackFencing;
-	auto defence_knack = Footwork;
-	add(player, Finesse, attack_knack, interactive, enemies, 0, 0, "Атаковать врага [рапирой].");
-	if(player->get(Riposte))
-		add(player, Finesse, attack_knack, interactive, enemies, 0, 0, "Атаковать врага [рапирой].");
-	if(player->get(Beat))
-		add(player, Finesse, Beat, interactive, enemies, 0, 0, "Нанести мощнейший удар, который пробьет защиту врага.");
-	if(player->get(PommelStrike))
-		add(player, Finesse, PommelStrike, interactive, enemies, 0, 0, "Нанести неожиданный удар ручкой оружия в лицо.");
-	auto id = logs::input(interactive, true, "Что будет делать [%1]?", player->getname());
-	if(id >= FirstAction && id <= LastAction)
+	logs::add("\n");
+	if(player->ishero())
 	{
-		auto ac = getaction(id);
-		if(!ac.enemy)
-			ac.enemy = choose(interactive, enemies);
+		for(unsigned i = 0; i < sizeof(action_data) / sizeof(action_data[0]); i++)
+		{
+			// Проверим есть ли навык
+			if(!player->get(action_data[i].knack))
+				continue;
+			// Если есть особые условия проверим их
+			if(action_data[i].validate
+				&& !(player->*action_data[i].validate)())
+				continue;
+			logs::add(i, action_data[i].text);
+		}
+		auto id = (knack_s)logs::input(interactive, false, "Что будет делать [%1]?", player->getname());
+		auto& a = action_data[id];
+		auto enemy = choose(interactive, select(enemies, enemies, action_data[id].validate), &combatant::getpassivedefence);
+		roller dr;
+		dr.player = player->player;
+		dr.trait = a.trait;
+		dr.knack = a.knack;
+		dr.keep = player->get(dr.trait);
+		dr.roll = dr.keep + player->get(dr.knack);
+		dr.target_number = enemy->getpassivedefence();
+		dr.rolldices();
+		if(dr.standart(interactive))
+		{
+			enemy->damage(5);
+		}
+		player->useaction();
+	}
+	else
+	{
+		auto enemy = enemies[rand() % zlen(enemies)];
+		logs::add("%1 набросились на %2.", player->getname(), enemy->getname());
+		roller dr; 
+		dr.roll = player->brute->threat;
+		dr.keep = player->count;
+		dr.target_number = player->getpassivedefence();
+		dr.rolldices();
+		if(dr.result >= dr.target_number)
+			enemy->damage(dr.result - dr.target_number);
 		player->useaction();
 	}
 }
@@ -210,7 +330,7 @@ static void roll_initiative()
 static void resolve_round()
 {
 	roll_initiative();
-	for(phase = 1; phase <=10; phase++)
+	for(phase = 1; phase <= 10; phase++)
 	{
 		for(auto& e : combatants)
 		{

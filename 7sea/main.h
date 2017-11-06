@@ -171,6 +171,13 @@ enum family_s : unsigned char {
 	OBannon, OTool,
 	AllaisDuCrieus, DuMontaigne, FlauberDuDore, RicheDuParroise, LevequeDAur,
 };
+enum side_s : char {
+	PartySide, EnemySide,
+};
+enum dice_s : char {
+	DramaDice, ReputationDice, GlamourDice, 
+	FirstDice = DramaDice, LastDice = GlamourDice,
+};
 struct hero
 {
 	nation_s			nation;
@@ -181,16 +188,18 @@ struct hero
 	operator bool() const { return traits[0]!=0; }
 	//
 	void				create(bool interactive, bool add_to_players = true);
+	void				create(nation_s nation, bool interactive, bool add_to_players);
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
 	void				clear();
+	void				damage(int wounds, bool interactive);
 	void				endsession();
 	const char*			getname() const { return "Алонсо"; }
 	int					get(advantage_s id) const { return advantages[id]; }
+	int					get(dice_s id) const;
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
-	int					getdrama() const;
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
@@ -199,13 +208,14 @@ struct hero
 	bool				isswordsman() const { return swordsman != 0; }
 	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0);
 	void				set(knack_s id, int value) { knacks[id] = value; }
-	void				usedrama();
+	void				use(dice_s id);
 private:
 	char				advantages[LastAdvantage + 1];
 	char				knacks[LastSorte + 1];
 	char				traits[LastTrait + 1];
-	char				dramawound, dramadice;
+	char				dramawound;
 	char				swordsman, sorcery;
+	char				dices[LastDice + 1];
 	//
 	void				chooseadvantage(bool interactive, char* skills);
 	void				choosecivilskills(bool interactive, char* skills);
@@ -235,7 +245,8 @@ struct roller
 	char*				getheader(char* temp) const;
 	void				rolldices();
 	bool				standart(bool interactive);
-	void				usedrama();
+	void				use(dice_s id);
+	bool				woundcheck(bool interactive, int wounds, int dramatic_wound_per = 20);
 };
 namespace logs
 {

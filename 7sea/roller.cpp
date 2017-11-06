@@ -1,5 +1,7 @@
 #include "main.h"
 
+const char* text_dramatic_wounds[] = {"драмматических ран", "драмматическое ранение", "драмматическую рану", "драмматических раны", "драмматических раны", "драмматических ран"};
+
 enum result_aciton_s {
 	KeepResult, UseDramaDice,
 };
@@ -122,11 +124,11 @@ char* roller::getheader(char* temp) const
 	return temp;
 }
 
-void roller::usedrama()
+void roller::use(dice_s id)
 {
 	if(!player)
 		return;
-	player->usedrama();
+	player->use(id);
 	auto r = rolldice(true);
 	result += r;
 	dices[0] += r;
@@ -143,15 +145,42 @@ bool roller::standart(bool interactive)
 			logs::add(KeepResult, "Принять [+удачный] результат");
 		else
 			logs::add(KeepResult, "Принять [-не удачный] результат");
-		if(player->getdrama())
-			logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", player->getdrama());
+		if(player->get(DramaDice))
+			logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", player->get(DramaDice));
+		auto id = (result_aciton_s)logs::input(true, false, getheader(temp));
+		switch(id)
+		{
+		case KeepResult:
+			return result >= target_number;
+		case UseDramaDice:
+			use(DramaDice);
+			break;
+		}
+	}
+}
+
+bool roller::woundcheck(bool interactive, int wounds, int dramatic_wound_per)
+{
+	char temp[512];
+	while(true)
+	{
+		auto drama_wounds = 0;
+		if(result >= target_number)
+			logs::add(KeepResult, "Принять [+удачный] результат/ Вы у вас станет %1i свежих ранений.");
+		else
+		{
+			drama_wounds = 1 + (target_number - result) / dramatic_wound_per;
+			logs::add(KeepResult, "Принять [-не удачный] результат. Вы получите %1i %2.", drama_wounds, maptbl(text_dramatic_wounds, drama_wounds));
+		}
+		if(player->get(DramaDice))
+			logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", player->get(DramaDice));
 		auto id = (result_aciton_s)logs::input(true, true, getheader(temp));
 		switch(id)
 		{
 		case KeepResult:
 			return result >= target_number;
 		case UseDramaDice:
-			usedrama();
+			use(DramaDice);
 			break;
 		}
 	}

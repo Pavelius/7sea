@@ -247,3 +247,20 @@ void hero::create(bool interactive, bool add_to_players)
 	if(add_to_players)
 		zcat(players, this);
 }
+
+void hero::create(nation_s nation, bool interactive, bool add_to_players)
+{
+	char skills[LastSkill + 1] = {0};
+	clear();
+	choosegender(interactive);
+	this->nation = nation;
+	choosetraits(interactive);
+	set(nation);
+	choosesorcery(interactive);
+	chooseadvantage(interactive, skills);
+	choosecivilskills(interactive, skills);
+	choosecombatskills(interactive, skills);
+	endsession();
+	if(add_to_players)
+		zcat(players, this);
+}

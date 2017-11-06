@@ -10,35 +10,47 @@ void hero::clear()
 
 void hero::endsession()
 {
-	experience += dramadice;
-	dramadice = traits[0];
+	experience += dices[DramaDice];
+	dices[DramaDice] = traits[0];
 	for(auto i = FirstTrait; i <= LastTrait; i = (trait_s)(i + 1))
 	{
-		if(dramadice > traits[i])
-			dramadice = traits[i];
+		if(dices[DramaDice] > traits[i])
+			dices[DramaDice] = traits[i];
 	}
 }
 
-int hero::getdrama() const
+int hero::get(dice_s id) const
 {
-	if(isplayer())
-		return dramadice;
-	else
-		return viledice;
-}
-
-void hero::usedrama()
-{
-	if(isplayer())
+	switch(id)
 	{
-		if(dramadice)
-		{
-			dramadice--;
-			viledice++;
-		}
+	case DramaDice:
+		if(isplayer())
+			return dices[DramaDice];
+		else
+			return viledice;
+		break;
+	default:
+		return dices[DramaDice];
 	}
-	else
-		viledice--;
+}
+
+void hero::use(dice_s id)
+{
+	switch(id)
+	{
+	case DramaDice:
+		if(isplayer())
+		{
+			if(dices[DramaDice])
+			{
+				dices[DramaDice]--;
+				viledice++;
+			}
+		}
+		else
+			viledice--;
+		break;
+	}
 }
 
 bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus)
@@ -95,4 +107,8 @@ bool hero::isplayer() const
 			return true;
 	}
 	return false;
+}
+
+void hero::damage(int wounds, bool interactive)
+{
 }
