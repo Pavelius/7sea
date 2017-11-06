@@ -130,7 +130,10 @@ void hero::chooseadvantage(bool interactive, char* skills)
 		swordsman = logs::input(interactive, true, "Вы входите в школу фехтовальщиков [%1]", getstr(value));
 		switch(swordsman)
 		{
-		case 1: experience -= 25; break;
+		case 1:
+			experience -= 25;
+			set(value, interactive, skills);
+			break;
 		}
 	}
 	if(true)

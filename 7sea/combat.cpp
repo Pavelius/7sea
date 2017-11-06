@@ -237,30 +237,32 @@ static struct action
 	trait_s				trait;
 	knack_s				knack;
 	const char*			text;
+	bool				hostile;
 	combatant::isproc	validate;
 	operator bool() const { return text != 0; }
 } action_data[] = {
-	{Finesse, AttackBow, "Пустить стрелу из [лука]."},
-	{Finesse, AttackCrossbow, "Выстрелить из [арбалета]."},
-	{Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза."},
-	{Finesse, AttackFencing, "Атаковать врага [рапирой]."},
-	{Finesse, AttackFirearms, "Выстрелить из [пистоля]."},
-	{Finesse, AttackHeavyWeapon, "Рубить всех врагов [мечом]."},
-	{Finesse, AttackKnife, "Тыкнуть во врага [ножем]."},
-	{Finesse, AttackPanzerhand, "Нанести удар [металической рукой]."},
-	{Finesse, AttackPolearm, "Сделать тычек [копьем]."},
-	{Finesse, AttackPugilism, "Нанести удары кулаком и ногами."},
-	{Finesse, Beat, "Нанести сильный удар, который враг не сможет блокировать.", &combatant::ishero},
-	{Finesse, Bind, "Скрутить оружие врага.", &combatant::isfencing},
-	{Finesse, CorpseACorpse, "Сойтись в близкой схватке, тело к телу.", &combatant::ishero},
-	{Finesse, Feint, "Выполнить обманную атаку.", &combatant::ishero},
-	{Finesse, Lunge, "Нанести сокрушительный удар, который нанесет много урона.", &combatant::ishero},
-	{Finesse, PommelStrike, "Нанести удар гардой в лицо.", &combatant::ishero},
-	{Finesse, Togging, "Выполнить яркий и вызывающий трюк, который обозлит или унизит врага.", &combatant::ishero},
+	{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
+	{Finesse, AttackCrossbow, "Выстрелить из [арбалета].", true},
+	{Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза.", true},
+	{Finesse, AttackFencing, "Атаковать врага [рапирой].", true},
+	{Finesse, AttackFirearms, "Выстрелить из [пистоля].", true},
+	{Finesse, AttackHeavyWeapon, "Рубить всех врагов [мечом].", true},
+	{Finesse, AttackKnife, "Тыкнуть во врага [ножем].", true},
+	{Finesse, AttackPanzerhand, "Нанести удар [металической рукой].", true},
+	{Finesse, AttackPolearm, "Сделать тычек [копьем].", true},
+	{Finesse, AttackPugilism, "Нанести удары кулаком и ногами.", true},
+	{Finesse, Beat, "Нанести сильный удар, который враг не сможет блокировать.", true, &combatant::ishero},
+	{Finesse, Bind, "Скрутить оружие врага.", true, &combatant::isfencing},
+	{Finesse, CorpseACorpse, "Сойтись в близкой схватке, тело к телу.", true, &combatant::ishero},
+	{Finesse, Feint, "Выполнить обманную атаку.", true, &combatant::ishero},
+	{Finesse, Lunge, "Нанести сокрушительный удар, который нанесет много урона.", true, &combatant::ishero},
+	{Finesse, PommelStrike, "Нанести удар гардой в лицо.", true, &combatant::ishero},
+	{Finesse, Togging, "Выполнить яркий и вызывающий трюк, который обозлит или унизит врага.", true, &combatant::ishero},
 };
 
 static void make_move(combatant* player)
 {
+	char temp[512];
 	bool interactive = (player->player && player->player->isplayer());
 	combatant* enemies[combatant_count + 1];
 	select(enemies, &combatant::isenemy, player, sizeof(enemies) / sizeof(enemies[0]) - 1);
@@ -276,8 +278,7 @@ static void make_move(combatant* player)
 			if(!player->get(action_data[i].knack))
 				continue;
 			// Если есть особые условия проверим их
-			if(action_data[i].validate
-				&& !(player->*action_data[i].validate)())
+			if(action_data[i].validate && !has(enemies, action_data[i].validate))
 				continue;
 			logs::add(i, action_data[i].text);
 		}
@@ -291,10 +292,23 @@ static void make_move(combatant* player)
 		dr.keep = player->get(dr.trait);
 		dr.roll = dr.keep + player->get(dr.knack);
 		dr.target_number = enemy->getpassivedefence();
-		dr.rolldices();
-		if(dr.standart(interactive))
+		if(enemy->count == 1)
 		{
-			enemy->damage(5);
+			dr.rolldices();
+			if(dr.standart(interactive))
+			{
+				enemy->damage(5);
+			}
+
+		}
+		else
+		{
+			logs::add(0, "Вырубить одного из них");
+			logs::add(1, "Вырубить сразу [двух] за раз. ");
+			logs::add(2, "Вырубить сразу [трех] за раз.");
+			dr.target_number = enemy->getpassivedefence();
+			dr.target_number += 5*logs::input(interactive, false, dr.getpromt(temp, false));
+			dr.rolldices();
 		}
 		player->useaction();
 	}

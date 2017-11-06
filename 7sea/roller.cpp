@@ -101,7 +101,7 @@ void roller::rolldices()
 	}
 }
 
-char* roller::getheader(char* temp) const
+char* roller::getpromt(char* temp, bool show_target_number) const
 {
 	temp[0] = 0;
 	if(player)
@@ -117,10 +117,19 @@ char* roller::getheader(char* temp) const
 		szprint(zend(temp), " [%1] + [%2]", getstr(trait), getstr(knack));
 		break;
 	}
-	if(target_number)
-		szprint(zend(temp), " против сложности [%1i]", target_number);
+	if(show_target_number)
+	{
+		if(target_number)
+			szprint(zend(temp), " против сложности [%1i]", target_number);
+	}
 	zcat(temp, ". ");
-	auto pp = print_result(zend(temp), dices, keep, result, bonus);
+	return temp;
+}
+
+char* roller::getheader(char* temp) const
+{
+	auto pp = getpromt(temp, true);
+	pp = print_result(zend(pp), dices, keep, result, bonus);
 	return temp;
 }
 

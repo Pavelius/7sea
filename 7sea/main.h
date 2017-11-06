@@ -227,6 +227,7 @@ private:
 	void				set(advantage_s value, bool interactive, char* skills);
 	void				set(nation_s value);
 	void				set(skill_s value, bool interactive, char* skills);
+	void				set(swordsman_s value, bool interactive, char* skills);
 };
 struct roller
 {
@@ -243,6 +244,7 @@ struct roller
 	hero*				player;
 	roller();
 	char*				getheader(char* temp) const;
+	char*				getpromt(char* temp, bool show_target_number) const;
 	void				rolldices();
 	bool				standart(bool interactive);
 	void				use(dice_s id);
