@@ -198,6 +198,7 @@ struct hero
 	int					get(dice_s id) const;
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
+	const char*			getA() const { return (gender == Female) ? "à" : "";}
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
 	sorcery_s			getsorcery() const;

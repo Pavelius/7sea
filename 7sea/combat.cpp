@@ -2,6 +2,8 @@
 #include "stringcreator.h"
 #include "command.h"
 
+static const char* text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "п€терых", "шестерых", "семерых", "всех"};
+
 const unsigned combatant_count = 32;
 
 static struct brute_i
@@ -85,6 +87,15 @@ struct combatant
 		if(player)
 			return player->getname();
 		return brute->name[1];
+	}
+
+	const char* getA() const
+	{
+		if(player)
+			return player->getA();
+		if(count)
+			return "";
+		return "и";
 	}
 
 	bool ishero() const
@@ -292,39 +303,45 @@ static void make_move(combatant* player)
 		dr.keep = player->get(dr.trait);
 		dr.roll = dr.keep + player->get(dr.knack);
 		dr.target_number = enemy->getpassivedefence();
-		if(enemy->count == 1)
+		if(enemy->ishero())
 		{
 			dr.rolldices();
 			if(dr.standart(interactive))
-			{
 				enemy->damage(5);
-			}
-
 		}
 		else
 		{
 			logs::add(0, "¬ырубить одного из них");
-			logs::add(1, "¬ырубить сразу [двух] за раз. ");
-			logs::add(2, "¬ырубить сразу [трех] за раз.");
+			if(enemy->count > 1)
+				logs::add(1, "¬ырубить сразу [двух] за раз. ");
+			if(enemy->count > 2)
+				logs::add(2, "¬ырубить сразу [трех] за раз.");
+			if(enemy->count > 3)
+				logs::add(3, "¬ырубить сразу [четырех] за раз.");
 			dr.target_number = enemy->getpassivedefence();
-			dr.target_number += 5*logs::input(interactive, false, dr.getpromt(temp, false));
+			auto raises = logs::input(interactive, false, dr.getpromt(temp, false));
+			dr.target_number += 5 * raises;
 			dr.rolldices();
+			auto killed = raises + 1;
+			if(dr.result >= dr.target_number)
+				logs::add("%1 атаковал%2 %3 и уложил%2 %4.", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
+			else
+				logs::add("%1 атаковал%2 %3, но не смог никого одолеть.", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
 		}
-		player->useaction();
 	}
 	else
 	{
 		auto enemy = enemies[rand() % zlen(enemies)];
 		logs::add("%1 набросились на %2.", player->getname(), enemy->getname());
-		roller dr; 
+		roller dr;
 		dr.roll = player->brute->threat;
 		dr.keep = player->count;
 		dr.target_number = player->getpassivedefence();
 		dr.rolldices();
 		if(dr.result >= dr.target_number)
 			enemy->damage(dr.result - dr.target_number);
-		player->useaction();
 	}
+	player->useaction();
 }
 
 static void roll_initiative()
