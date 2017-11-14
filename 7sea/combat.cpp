@@ -311,20 +311,23 @@ static void make_move(combatant* player)
 		}
 		else
 		{
-			logs::add(0, "Вырубить одного из них");
+			logs::add(0, "Вырубить одного из них. Сложность [%1i].", dr.target_number);
 			if(enemy->count > 1)
-				logs::add(1, "Вырубить сразу [двух] за раз. ");
+				logs::add(1, "Вырубить сразу [двух] за раз. Сложность [%1i].", dr.target_number + 5 * 1);
 			if(enemy->count > 2)
-				logs::add(2, "Вырубить сразу [трех] за раз.");
+				logs::add(2, "Вырубить сразу [трех] за раз. Сложность [%1i].", dr.target_number + 5 * 2);
 			if(enemy->count > 3)
-				logs::add(3, "Вырубить сразу [четырех] за раз.");
+				logs::add(3, "Вырубить сразу [четырех] за раз. Сложность [%1i].", dr.target_number + 5 * 3);
 			dr.target_number = enemy->getpassivedefence();
 			auto raises = logs::input(interactive, false, dr.getpromt(temp, false));
 			dr.target_number += 5 * raises;
 			dr.rolldices();
 			auto killed = raises + 1;
 			if(dr.result >= dr.target_number)
+			{
+				enemy->count -= killed;
 				logs::add("%1 атаковал%2 %3 и уложил%2 %4.", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
+			}
 			else
 				logs::add("%1 атаковал%2 %3, но не смог никого одолеть.", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
 		}
@@ -338,8 +341,11 @@ static void make_move(combatant* player)
 		dr.keep = player->count;
 		dr.target_number = player->getpassivedefence();
 		dr.rolldices();
-		if(dr.result >= dr.target_number)
-			enemy->damage(dr.result - dr.target_number);
+		if(enemy->ishero())
+		{
+			if(dr.result >= dr.target_number)
+				enemy->damage(dr.result - dr.target_number);
+		}
 	}
 	player->useaction();
 }
@@ -408,6 +414,8 @@ static void print_round(char* result)
 static void print_combatant(char* result, combatant& e)
 {
 	zcat(result, e.getname());
+	if(e.brute && e.count)
+		szprint(zend(result), " (%1i)", e.count);
 	if(e.actions[0])
 	{
 		zcat(result, ": ");
