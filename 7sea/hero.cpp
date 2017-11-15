@@ -193,7 +193,7 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 		while(interactive)
 		{
 			logs::add("\n");
-			sayroll(zend(content), Brawn, NoKnack, target_number);
+			sayroll(zend(content), trait, knack, target_number);
 			add_result(zend(content), dices, keep, result);
 			if(result >= target_number)
 				logs::add(KeepResult, "Принять [+удачный] результат");
@@ -224,6 +224,7 @@ void hero::damage(int wounds_count, bool interactive, int drama_per_wounds)
 	wounds += wounds_count;
 	int dices[32];
 	auto bonus = 0;
+	auto train = Brawn;
 	auto keep = get(Brawn);
 	auto roll = keep;
 	auto result = rolldices(dices, roll, keep, bonus, true);
@@ -256,7 +257,13 @@ void hero::damage(int wounds_count, bool interactive, int drama_per_wounds)
 		}
 	}
 	if(result < wounds)
-		dramawound += 1 + (wounds - result) / drama_per_wounds;
+	{
+		auto count = 1 + (wounds - result) / drama_per_wounds;
+		logs::add("%1 получил%2 [%3i] %4.", getname(), getA(), count, maptbl(text_dramatic_wounds, count));
+		dramawound += count;
+	}
+	else
+		logs::add("У %1 теперь [%2i] свежих ранений.", getname(), wounds);
 }
 
 bool hero::contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus)

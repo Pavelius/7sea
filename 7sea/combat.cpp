@@ -249,7 +249,7 @@ static combatant* choose(const combatant* player, bool interactive, bool hostile
 		else
 			logs::add(i, result[i]->getname());
 	}
-	auto i = logs::input(interactive, true, "”кажите [цель]:");
+	auto i = logs::input(interactive, false, "”кажите [цель]:");
 	return result[i];
 }
 
@@ -271,12 +271,15 @@ static void make_move(combatant* player)
 		logs::add("\n");
 		auto enemy = choose(player, interactive, a.hostile, a.heroonly, &combatant::getpassivedefence);
 		auto roll_result = 0;
-		auto hit = player->player->roll(true, a.trait, a.knack, enemy->getpassivedefence(), 0, &roll_result);
 		auto tn = enemy->getpassivedefence();
 		if(enemy->ishero())
 		{
-			if(hit)
-				enemy->damage(5);
+			if(player->player->roll(true, a.trait, a.knack, enemy->getpassivedefence(), 0, &roll_result))
+			{
+				item weapon = Rapier;
+				auto damage = weapon.getdamage();
+				enemy->damage(hero::roll(damage.roll, damage.keep));
+			}
 		}
 		else
 		{
@@ -293,7 +296,7 @@ static void make_move(combatant* player)
 			if(player->player->roll(true, a.trait, a.knack, tn + 5*raises))
 			{
 				enemy->damage(0, raises);
-				logs::add("%1 атаковал%2 %3 и уложил%2 %4.", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
+				logs::add("%1 атаковал%2 %3 и уложил%2 [%4].", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
 			}
 			else
 				logs::add("%1 атаковал%2 %3, но не смог никого одолеть.", player->getname(), player->getA(), enemy->getname());
@@ -312,6 +315,8 @@ static void make_move(combatant* player)
 			int wounds = (1 + raises) * weapon;
 			if(enemy->ishero())
 				enemy->damage(wounds);
+			else
+				enemy->damage(0, 1 + wounds/20);
 		}
 		else
 			logs::add("%1 удачно отбил%2.", player->getAS());

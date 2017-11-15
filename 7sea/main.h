@@ -191,6 +191,8 @@ struct damageinfo
 struct item
 {
 	item_s				type;
+	item() : type(NoItem) {}
+	item(item_s type) : type(type) {}
 	const damageinfo&	getdamage() const;
 };
 struct hero
