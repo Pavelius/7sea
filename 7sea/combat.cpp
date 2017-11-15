@@ -150,6 +150,23 @@ struct combatant
 			count = 0;
 	}
 
+	bool isreadyblock() const
+	{
+		return actions[0] == phase
+			|| (actions[0] && actions[1]);
+	}
+
+	void useblock()
+	{
+		if(actions[0] == phase)
+			useaction();
+		else
+		{
+			useaction();
+			useaction();
+		}
+	}
+
 };
 static adat<combatant, combatant_count> combatants;
 
@@ -253,6 +270,13 @@ static combatant* choose(const combatant* player, bool interactive, bool hostile
 	return result[i];
 }
 
+static bool try_defend(combatant* player, combatant* enemy, trait_s trait, knack_s knack)
+{
+	if(!enemy->isreadyblock())
+		return false;
+	return true;
+}
+
 static void make_move(combatant* player)
 {
 	char temp[512];
@@ -274,7 +298,7 @@ static void make_move(combatant* player)
 		auto tn = enemy->getpassivedefence();
 		if(enemy->ishero())
 		{
-			if(player->player->roll(true, a.trait, a.knack, enemy->getpassivedefence(), 0, &roll_result))
+			if(player->player->roll(true, a.trait, a.knack, tn, 0, &roll_result))
 			{
 				item weapon = Rapier;
 				auto damage = weapon.getdamage();
