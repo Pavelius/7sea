@@ -4,6 +4,8 @@ static struct knack_i
 {
 	const char*			name[2];
 } knack_data[] = {
+	{{"", ""}},
+	//
 	{{"Composer", "Композитор"}},
 	{{"Drawing", "Рисование"}},
 	{{"Musician", "Музыкант"}},

@@ -151,6 +151,7 @@
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="io.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="knack.cpp" />
     <ClCompile Include="logs.cpp" />
     <ClCompile Include="main.cpp" />
@@ -158,7 +159,6 @@
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="print.cpp" />
-    <ClCompile Include="roller.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="sorcery.cpp" />
     <ClCompile Include="sprite.cpp" />

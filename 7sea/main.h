@@ -32,6 +32,7 @@ enum advantage_s : unsigned char {
 	FirstAdvantage = AbleDrinker, LastAdvantage = University,
 };
 enum knack_s : unsigned char {
+	NoKnack,
 	Composer, Drawing, Musician, Sculpting, Singing, Writing,
 	Dancing, Etiquette, Fashion, Oratory,
 	Gambling, Quack, Shadowing, Stealth,
@@ -178,6 +179,20 @@ enum dice_s : char {
 	DramaDice, ReputationDice, GlamourDice, 
 	FirstDice = DramaDice, LastDice = GlamourDice,
 };
+enum item_s : char {
+	NoItem,
+	Pistol, Bow, Rapier, Sword, Axe, Spear,
+};
+struct damageinfo
+{
+	char				roll;
+	char				keep;
+};
+struct item
+{
+	item_s				type;
+	const damageinfo&	getdamage() const;
+};
 struct hero
 {
 	nation_s			nation;
@@ -191,7 +206,7 @@ struct hero
 	void				create(nation_s nation, bool interactive, bool add_to_players);
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
 	void				clear();
-	void				damage(int wounds, bool interactive);
+	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
 	void				endsession();
 	const char*			getname() const { return "Алонсо"; }
 	int					get(advantage_s id) const { return advantages[id]; }
@@ -199,22 +214,29 @@ struct hero
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
 	const char*			getA() const { return (gender == Female) ? "а" : "";}
+	const char*			getAS() const { return (gender == Female) ? "ась" : "ся"; }
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
+	int					getdramawounds() const { return dramawound; }
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
+	int					getwounds() const { return wounds; }
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
 	bool				isplayer() const;
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
-	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0);
+	static int			roll(int roll, int keep);
+	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0);
+	char*				sayroll(char* temp, trait_s trait, knack_s knack = NoKnack, int target_number = 0) const;
 	void				set(knack_s id, int value) { knacks[id] = value; }
+	void				setdramawounds(int value) { dramawound = value; }
+	void				setwounds(int value) { wounds = value; }
 	void				use(dice_s id);
 private:
 	char				advantages[LastAdvantage + 1];
 	char				knacks[LastSorte + 1];
 	char				traits[LastTrait + 1];
-	char				dramawound;
+	unsigned char		dramawound, wounds;
 	char				swordsman, sorcery;
 	char				dices[LastDice + 1];
 	//
@@ -229,6 +251,7 @@ private:
 	void				set(nation_s value);
 	void				set(skill_s value, bool interactive, char* skills);
 	void				set(swordsman_s value, bool interactive, char* skills);
+	int					use(int* dices, dice_s id);
 };
 struct roller
 {
@@ -237,6 +260,7 @@ struct roller
 	};
 	type_s				type;
 	int					dices[10], roll, keep, bonus;
+	int					drama_wounds;
 	bool				explose;
 	int					result;
 	int					target_number;
