@@ -2,9 +2,14 @@
 #include "stringcreator.h"
 #include "command.h"
 
-static const char* text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "пятерых", "шестерых", "семерых", "всех"};
+static const char*	text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "пятерых", "шестерых", "семерых", "всех"};
+static char			round, phase;
+const unsigned		combatant_count = 32;
 
-const unsigned combatant_count = 32;
+static int compare_dices(const void* p1, const void* p2)
+{
+	return *((char*)p1) - *((char*)p2);
+}
 
 static struct brute_i
 {
@@ -34,17 +39,15 @@ static struct brute_i
 	{{"Cardinal's mens", "Люди кардинала", "Человек кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
 
-static char			round, phase;
-
 struct combatant
 {
-	brute_i*		brute;
-	hero*			player;
-	char			actions[10];
-	int				count;
-	side_s			side;
 
 	operator bool() const { return count != 0; }
+
+	void clear()
+	{
+		memset(this, 0, sizeof(*this));
+	}
 
 	int get(trait_s id) const
 	{
@@ -62,7 +65,7 @@ struct combatant
 			return brute->get(id);
 	}
 
-	int getactions() const
+	int getinitiative() const
 	{
 		auto result = 0;
 		for(auto e : actions)
@@ -72,11 +75,6 @@ struct combatant
 			result += e;
 		}
 		return result;
-	}
-
-	void clear()
-	{
-		memset(this, 0, sizeof(*this));
 	}
 
 	const char* getname() const
@@ -104,6 +102,11 @@ struct combatant
 		return "ись";
 	}
 
+	bool isplayer() const
+	{
+		return player && player->isplayer();
+	}
+
 	bool ishero() const
 	{
 		return player != 0;
@@ -121,6 +124,13 @@ struct combatant
 		return isenemy(p);
 	}
 
+	bool roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0)
+	{
+		if(player)
+			return player->roll(interactive, trait, knack, target_number, bonus, result);
+		return 0;
+	}
+
 	knack_s getdefence() const
 	{
 		return Footwork;
@@ -132,6 +142,11 @@ struct combatant
 			return (1 + brute->threat) * 5;
 		auto knack = getdefence();
 		return (1 + player->get(knack)) * 5;
+	}
+
+	int getaction() const
+	{
+		return actions[0];
 	}
 
 	void useaction()
@@ -152,13 +167,13 @@ struct combatant
 
 	bool isreadyblock() const
 	{
-		return actions[0] == phase
-			|| (actions[0] && actions[1]);
+		return getaction() == phase
+			|| (getaction() && actions[1]);
 	}
 
 	void useblock()
 	{
-		if(actions[0] == phase)
+		if(getaction() == phase)
 			useaction();
 		else
 		{
@@ -167,35 +182,83 @@ struct combatant
 		}
 	}
 
+	int getcount() const
+	{
+		return count;
+	}
+
+	char* sayroll(char* temp, trait_s trait, knack_s knack, int target_number) const
+	{
+		if(!player)
+			return temp;
+		return player->sayroll(temp, trait, knack, target_number);
+	}
+
+	void getdescription(char* result)
+	{
+		zcat(result, getname());
+		if(brute && getcount())
+			szprint(zend(result), " (%1i)", getcount());
+		if(actions[0])
+		{
+			zcat(result, ": ");
+			auto p = zend(result);
+			for(auto e : actions)
+			{
+				if(!e)
+					break;
+				if(p[0])
+					zcat(p, ", ");
+				sznum(zend(p), e);
+			}
+			zcat(result, ".");
+		}
+	}
+
+	side_s getside() const
+	{
+		return side;
+	}
+
+	void rollinitiative()
+	{
+		memset(actions, 0, sizeof(actions));
+		auto panache = get(Panache);
+		for(auto i = 0; i < panache; i++)
+			actions[i] = 1 + rand() % 10;
+		qsort(actions, panache, sizeof(actions[0]), compare_dices);
+	}
+
+	combatant()
+	{
+	}
+
+	combatant(hero* object, side_s side)
+	{
+		clear();
+		this->player = object;
+		this->count = 1;
+		this->side = side;
+	}
+
+	combatant(brute_i* object, side_s side)
+	{
+		clear();
+		this->brute = object;
+		this->count = 6;
+		this->side = side;
+	}
+
+private:
+
+	brute_i*	brute;
+	hero*		player;
+	char		actions[10];
+	int			count;
+	side_s		side;
+
 };
 static adat<combatant, combatant_count> combatants;
-
-static int compare_dices(const void* p1, const void* p2)
-{
-	return *((char*)p1) - *((char*)p2);
-}
-
-static void add(hero* object, side_s side = PartySide)
-{
-	auto p = combatants.add();
-	if(!p)
-		return;
-	p->clear();
-	p->player = object;
-	p->count = 1;
-	p->side = side;
-}
-
-static void add(brute_i* object, side_s side = EnemySide)
-{
-	auto p = combatants.add();
-	if(!p)
-		return;
-	p->clear();
-	p->brute = object;
-	p->count = 6;
-	p->side = side;
-}
 
 static struct action
 {
@@ -280,7 +343,7 @@ static bool try_defend(combatant* player, combatant* enemy, trait_s trait, knack
 static void make_move(combatant* player)
 {
 	char temp[512];
-	bool interactive = (player->player && player->player->isplayer());
+	bool interactive = player->isplayer();
 	if(player->ishero())
 	{
 		for(unsigned i = 0; i < sizeof(action_data) / sizeof(action_data[0]); i++)
@@ -298,7 +361,7 @@ static void make_move(combatant* player)
 		auto tn = enemy->getpassivedefence();
 		if(enemy->ishero())
 		{
-			if(player->player->roll(true, a.trait, a.knack, tn, 0, &roll_result))
+			if(player->roll(true, a.trait, a.knack, tn, 0, &roll_result))
 			{
 				item weapon = Rapier;
 				auto damage = weapon.getdamage();
@@ -308,16 +371,16 @@ static void make_move(combatant* player)
 		else
 		{
 			logs::add(0, "Вырубить одного из них. Сложность [%1i].", tn);
-			if(enemy->count > 1)
+			if(enemy->getcount() > 1)
 				logs::add(1, "Вырубить сразу [двух] за раз. Сложность [%1i].", tn + 5 * 1);
-			if(enemy->count > 2)
+			if(enemy->getcount() > 2)
 				logs::add(2, "Вырубить сразу [трех] за раз. Сложность [%1i].", tn + 5 * 2);
-			if(enemy->count > 3)
+			if(enemy->getcount() > 3)
 				logs::add(3, "Вырубить сразу [четырех] за раз. Сложность [%1i].", tn + 5 * 3);
-			auto raises = logs::input(interactive, false, player->player->sayroll(temp, a.trait, a.knack, 0));
+			auto raises = logs::input(interactive, false, player->sayroll(temp, a.trait, a.knack, 0));
 			logs::add("\n");
 			auto killed = 1 + raises;
-			if(player->player->roll(true, a.trait, a.knack, tn + 5*raises))
+			if(player->roll(true, a.trait, a.knack, tn + 5*raises))
 			{
 				enemy->damage(0, raises);
 				logs::add("%1 атаковал%2 %3 и уложил%2 [%4].", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
@@ -332,7 +395,7 @@ static void make_move(combatant* player)
 		auto tn = enemy->getpassivedefence();
 		logs::add("\n");
 		logs::add("%1 набросились на %2.", player->getname(), enemy->getname());
-		int raises = (hero::roll(player->count, player->brute->threat) - tn)/5;
+		int raises = (hero::roll(player->getcount(), player->get(Finesse)) - tn)/5;
 		if(raises >= 0)
 		{
 			int weapon = 6;
@@ -354,11 +417,7 @@ static void roll_initiative()
 	{
 		if(!e)
 			continue;
-		memset(e.actions, 0, sizeof(e.actions));
-		auto panache = e.get(Panache);
-		for(auto i = 0; i < panache; i++)
-			e.actions[i] = 1 + rand() % 10;
-		qsort(e.actions, panache, sizeof(e.actions[0]), compare_dices);
+		e.rollinitiative();
 	}
 }
 
@@ -371,7 +430,7 @@ static void resolve_round()
 		{
 			if(!e)
 				continue;
-			if(e.actions[0] != phase)
+			if(e.getaction() != phase)
 				continue;
 			make_move(&e);
 		}
@@ -381,23 +440,23 @@ static void resolve_round()
 
 static bool is_combat_continue()
 {
-	auto side = combatants[0].side;
+	auto side = combatants[0].getside();
 	for(auto& e : combatants)
 	{
-		if(e.side != side)
+		if(e.getside() != side)
 			return true;
 	}
 	return false;
 }
 
-void game::combat()
+void hero::combat()
 {
 	logs::state push;
 	logc.information = "%round\n%combatants";
 	round = 1; phase = 0;
-	add(players[0], PartySide);
-	add(players[1], PartySide);
-	add(brute_data, EnemySide);
+	combatants.add({players[0], PartySide});
+	combatants.add({players[1], PartySide});
+	combatants.add({brute_data, EnemySide});
 	while(is_combat_continue())
 	{
 		resolve_round();
@@ -410,27 +469,6 @@ static void print_round(char* result)
 	szprint(result, "##Раунд %1i, фаза %2i", round, phase);
 }
 
-static void print_combatant(char* result, combatant& e)
-{
-	zcat(result, e.getname());
-	if(e.brute && e.count)
-		szprint(zend(result), " (%1i)", e.count);
-	if(e.actions[0])
-	{
-		zcat(result, ": ");
-		auto p = zend(result);
-		for(auto e : e.actions)
-		{
-			if(!e)
-				break;
-			if(p[0])
-				zcat(p, ", ");
-			sznum(zend(p), e);
-		}
-		zcat(result, ".");
-	}
-}
-
 static void print_combatants(char* result)
 {
 	result[0] = 0;
@@ -438,7 +476,7 @@ static void print_combatants(char* result)
 	{
 		if(result[0])
 			zcat(result, "\n");
-		print_combatant(zend(result), e);
+		e.getdescription(zend(result));
 	}
 }
 

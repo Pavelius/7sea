@@ -207,6 +207,7 @@ struct hero
 	void				create(bool interactive, bool add_to_players = true);
 	void				create(nation_s nation, bool interactive, bool add_to_players);
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
+	static void			combat();
 	void				clear();
 	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
 	void				endsession();
@@ -223,6 +224,7 @@ struct hero
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	int					getwounds() const { return wounds; }
+	static bool			iscivil(skill_s value);
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
 	bool				isplayer() const;
 	bool				issorcery() const { return sorcery != 0; }
@@ -285,11 +287,6 @@ namespace logs
 		state();
 		~state();
 	};
-}
-namespace game
-{
-	void				combat();
-	bool				iscivil(skill_s value);
 }
 extern adat<hero, 64>	heroes;
 extern logs::state		logc;

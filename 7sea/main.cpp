@@ -9,7 +9,7 @@ int	main(int argc, char *argv[])
 	party[0].set(AttackFencing, 2);
 	party[1].create(Avalon, false, true);
 	party[1].set(AttackHeavyWeapon, 1);
-	game::combat();
+	hero::combat();
 	return 0;
 }
 

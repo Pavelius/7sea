@@ -58,7 +58,7 @@ void hero::set(skill_s value, bool interacive, char* skills)
 
 int hero::getcost(skill_s value) const
 {
-	if(game::iscivil(value))
+	if(iscivil(value))
 	{
 		if(get(University))
 			return 1;
@@ -71,7 +71,7 @@ int hero::getcost(skill_s value) const
 	return 2;
 }
 
-bool game::iscivil(skill_s value)
+bool hero::iscivil(skill_s value)
 {
 	return value >= Artist && value <= Streetwise;
 }
