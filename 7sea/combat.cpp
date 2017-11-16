@@ -2,9 +2,8 @@
 #include "stringcreator.h"
 #include "command.h"
 
-static const char*	text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "пятерых", "шестерых", "семерых", "всех"};
 static char			round, phase;
-const unsigned		combatant_count = 32;
+static const char*	text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "пятерых", "шестерых", "семерых", "всех"};
 
 static int compare_dices(const void* p1, const void* p2)
 {
@@ -149,6 +148,17 @@ struct combatant
 		return actions[0];
 	}
 
+	int getactioncount() const
+	{
+		auto result = 0;
+		for(auto e : actions)
+		{
+			if(e)
+				result++;
+		}
+		return result;
+	}
+
 	void useaction()
 	{
 		memcpy(actions, actions + 1, sizeof(actions) - 1);
@@ -165,21 +175,11 @@ struct combatant
 			count = 0;
 	}
 
-	bool isreadyblock() const
-	{
-		return getaction() == phase
-			|| (getaction() && actions[1]);
-	}
-
-	void useblock()
+	int getblockactions() const
 	{
 		if(getaction() == phase)
-			useaction();
-		else
-		{
-			useaction();
-			useaction();
-		}
+			return 1;
+		return 2;
 	}
 
 	int getcount() const
@@ -258,7 +258,7 @@ private:
 	side_s		side;
 
 };
-static adat<combatant, combatant_count> combatants;
+static adat<combatant, 32> combatants;
 
 static struct action
 {
@@ -333,11 +333,27 @@ static combatant* choose(const combatant* player, bool interactive, bool hostile
 	return result[i];
 }
 
-static bool try_defend(combatant* player, combatant* enemy, trait_s trait, knack_s knack)
+static bool try_defend(bool interactive, combatant* player, combatant* enemy, knack_s defence_knack, int tn)
 {
-	if(!enemy->isreadyblock())
+	auto need_actions = enemy->getblockactions();
+	if(enemy->getactioncount()<need_actions)
 		return false;
-	return true;
+	if(interactive)
+	{
+		logs::add(1, "Попытаться заблокировать, сделать бросок [%1]+[%2] и потратив %3i действий.", getstr(Wits), getstr(defence_knack), need_actions);
+		logs::add(0, "Не пытаться блокировать. Сохранить действия для хода", getstr(Wits), getstr(defence_knack), need_actions);
+		auto id = logs::input(true, false);
+		if(!id)
+			return false;
+	}
+	for(auto i = 0; i < need_actions; i++)
+		enemy->useaction();
+	if(enemy->roll(interactive, Wits, defence_knack, tn))
+	{
+		logs::add("%1 отбил%а удар.", enemy->getname(), enemy->getA());
+		return true;
+	}
+	return false;
 }
 
 static void make_move(combatant* player)
@@ -363,9 +379,12 @@ static void make_move(combatant* player)
 		{
 			if(player->roll(true, a.trait, a.knack, tn, 0, &roll_result))
 			{
-				item weapon = Rapier;
-				auto damage = weapon.getdamage();
-				enemy->damage(hero::roll(damage.roll, damage.keep));
+				if(!try_defend(true, player, enemy, enemy->getdefence(), roll_result))
+				{
+					item weapon = Rapier;
+					auto damage = weapon.getdamage();
+					enemy->damage(hero::roll(damage.roll, damage.keep));
+				}
 			}
 		}
 		else
@@ -395,18 +414,22 @@ static void make_move(combatant* player)
 		auto tn = enemy->getpassivedefence();
 		logs::add("\n");
 		logs::add("%1 набросились на %2.", player->getname(), enemy->getname());
-		int raises = (hero::roll(player->getcount(), player->get(Finesse)) - tn)/5;
+		auto roll_result = hero::roll(player->getcount(), player->get(Finesse));
+		int raises = (roll_result - tn)/5;
 		if(raises >= 0)
 		{
-			int weapon = 6;
-			int wounds = (1 + raises) * weapon;
-			if(enemy->ishero())
-				enemy->damage(wounds);
-			else
-				enemy->damage(0, 1 + wounds/20);
+			if(!try_defend(enemy->isplayer(), player, enemy, enemy->getdefence(), roll_result))
+			{
+				int weapon = 6;
+				int wounds = (1 + raises) * weapon;
+				if(enemy->ishero())
+					enemy->damage(wounds);
+				else
+					enemy->damage(0, 1 + wounds / 20);
+			}
 		}
 		else
-			logs::add("%1 удачно отбил%2.", player->getAS());
+			logs::add("%1 удачно отбил%2 от атаки.", player->getAS());
 	}
 	player->useaction();
 }
