@@ -155,6 +155,7 @@
     <ClCompile Include="knack.cpp" />
     <ClCompile Include="logs.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="names.cpp" />
     <ClCompile Include="nation.cpp" />
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />

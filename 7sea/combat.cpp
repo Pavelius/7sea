@@ -18,7 +18,7 @@ static struct brute_i
 		char			value;
 		operator bool() const { return value != 0; }
 	};
-	const char*			name[3];
+	const char*			name[2];
 	char				threat;
 	knackset			skills[8];
 
@@ -35,7 +35,7 @@ static struct brute_i
 	}
 
 } brute_data[] = {
-	{{"Cardinal's mens", "Люди кардинала", "Человек кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
+	{{"Cardinal's mens", "Люди кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
 
 struct combatant
@@ -199,6 +199,11 @@ struct combatant
 		zcat(result, getname());
 		if(brute && getcount())
 			szprint(zend(result), " (%1i)", getcount());
+		else if(player && player->isplayer())
+		{
+			if(player->getdramawounds())
+				szprint(zend(result), " (%1i/%2i)", player->getdramawounds(), player->getmaxdramawounds());
+		}
 		if(actions[0])
 		{
 			zcat(result, ": ");
@@ -340,7 +345,7 @@ static bool try_defend(bool interactive, combatant* player, combatant* enemy, kn
 		return false;
 	if(interactive)
 	{
-		logs::add(1, "Попытаться заблокировать, сделать бросок [%1]+[%2] и потратив %3i действий.", getstr(Wits), getstr(defence_knack), need_actions);
+		logs::add(1, "Попытаться заблокировать, сделать бросок [%1]+[%2] против сложности [%4i] и потратив %3i действий.", getstr(Wits), getstr(defence_knack), need_actions, tn);
 		logs::add(0, "Не пытаться блокировать. Сохранить действия для хода", getstr(Wits), getstr(defence_knack), need_actions);
 		auto id = logs::input(true, false);
 		if(!id)

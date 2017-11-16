@@ -211,7 +211,9 @@ struct hero
 	void				clear();
 	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
 	void				endsession();
-	const char*			getname() const { return "Алонсо"; }
+	const char*			getname() const { return getname(name); }
+	static short unsigned getnamerandom(gender_s gender, nation_s nation);
+	static const char*	getname(short unsigned id);
 	int					get(advantage_s id) const { return advantages[id]; }
 	int					get(dice_s id) const;
 	int					get(trait_s id) const { return traits[id]; }
@@ -221,6 +223,7 @@ struct hero
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
 	int					getdramawounds() const { return dramawound; }
+	int					getmaxdramawounds() const { return traits[Resolve]*2; }
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	int					getwounds() const { return wounds; }
@@ -243,6 +246,7 @@ private:
 	unsigned char		dramawound, wounds;
 	char				swordsman, sorcery;
 	char				dices[LastDice + 1];
+	short unsigned		name;
 	//
 	void				chooseadvantage(bool interactive, char* skills);
 	void				choosecivilskills(bool interactive, char* skills);
@@ -256,28 +260,6 @@ private:
 	void				set(skill_s value, bool interactive, char* skills);
 	void				set(swordsman_s value, bool interactive, char* skills);
 	int					use(int* dices, dice_s id);
-};
-struct roller
-{
-	enum type_s {
-		TraitAndKnackRoll, TraitRoll
-	};
-	type_s				type;
-	int					dices[10], roll, keep, bonus;
-	int					drama_wounds;
-	bool				explose;
-	int					result;
-	int					target_number;
-	trait_s				trait;
-	knack_s				knack;
-	hero*				player;
-	roller();
-	char*				getheader(char* temp) const;
-	char*				getpromt(char* temp, bool show_target_number) const;
-	void				rolldices();
-	bool				standart(bool interactive);
-	void				use(dice_s id);
-	bool				woundcheck(bool interactive, int wounds, int dramatic_wound_per = 20);
 };
 namespace logs
 {

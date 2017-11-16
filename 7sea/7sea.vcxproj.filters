@@ -162,6 +162,9 @@
     <ClCompile Include="item.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="names.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Библиотека">

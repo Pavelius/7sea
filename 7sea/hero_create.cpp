@@ -263,6 +263,7 @@ void hero::create(nation_s nation, bool interactive, bool add_to_players)
 	chooseadvantage(interactive, skills);
 	choosecivilskills(interactive, skills);
 	choosecombatskills(interactive, skills);
+	name = getnamerandom(this->gender, this->nation);
 	endsession();
 	if(add_to_players)
 		zcat(players, this);
